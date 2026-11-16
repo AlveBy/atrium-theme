@@ -23,4 +23,8 @@ return [
 
     // The latest records of each module on the home page.
     'home_items' => 3,
+
+    // Views drawn under every record page with $record and $page; a module
+    // package (reviews, comments) pushes its own here from its provider.
+    'record_views' => [],
 ];

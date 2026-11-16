@@ -60,6 +60,7 @@ Other settings (`php artisan vendor:publish --tag=atrium-theme-config`):
 | `routes` | `true` | register the pages |
 | `per_page` | `20` | records per page in a list |
 | `home_items` | `3` | records of each module on the home page |
+| `record_views` | `[]` | views drawn under every record page with `$record` and `$page`; module packages such as `alveby/atrium-reviews` add theirs |
 
 ## Change the look
 

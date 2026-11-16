@@ -26,4 +26,9 @@
             @include('atrium-theme::partials.block', ['block' => $block])
         @endforeach
     </article>
+
+    {{-- Other packages add their part under a record: reviews, comments, a form. --}}
+    @foreach ((array) config('atrium-theme.record_views', []) as $recordView)
+        @include($recordView, ['record' => $page->record, 'page' => $page])
+    @endforeach
 @endsection
