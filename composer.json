@@ -1,0 +1,50 @@
+{
+    "name": "alveby/atrium-theme",
+    "description": "Neutral public site theme for Atrium that renders any module",
+    "type": "library",
+    "license": "MIT",
+    "homepage": "https://github.com/AlveBy/atrium",
+    "keywords": [
+        "laravel",
+        "admin",
+        "cms",
+        "bitrix",
+        "migration",
+        "multisite",
+        "i18n"
+    ],
+    "require": {
+        "php": "^8.3",
+        "illuminate/support": "^13.0",
+        "alveby/atrium": "@dev"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^11.0",
+        "phpunit/phpunit": "^12.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Atrium\\Theme\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Atrium\\Theme\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Atrium\\Theme\\ThemeServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "path",
+            "url": "../admin"
+        }
+    ]
+}
