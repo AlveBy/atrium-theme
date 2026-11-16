@@ -36,6 +36,7 @@
     <script>try{var t=localStorage.getItem('atrium-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
     <style>{!! $themeStyles !!}</style>
     <x-atrium::head />
+    @stack('head')
 </head>
 <body>
     <x-atrium::body-start />

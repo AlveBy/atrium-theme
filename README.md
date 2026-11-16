@@ -78,6 +78,20 @@ They land in `resources/views/vendor/atrium-theme`: `layout`, `home`, `list`, `p
 
 The layout already prints the site's counters and codes (`<x-atrium::head />`, `<x-atrium::body-start />`, `<x-atrium::body-end />`) and `hreflang`.
 
+### A module's own page
+
+A module that wants its pages to look its own way names a view in its model; the theme keeps the routes, the menu, the languages and the sitemap:
+
+```php
+public static function themeView(string $page): ?string
+{
+    // index: the module's list, section: a section with its records, page: one record
+    return $page === 'page' ? 'reviews::page' : null;
+}
+```
+
+The view gets the same data as the theme's own (`records`, `page`, `canonical`, `breadcrumbs`, …), usually `@extends('atrium-theme::layout')`, and may `@push('head')` tags such as structured data into the page's `<head>`.
+
 ## Colours
 
 The stylesheet is inline, so there is nothing to build or publish. Every colour is a custom property; override them in a stylesheet of your own after the theme's.

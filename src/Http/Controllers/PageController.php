@@ -67,7 +67,7 @@ final class PageController extends Controller
         $records = $class === null ? null : $this->paginate($this->pages->visible($class));
         $switch = $this->everyLanguage(fn (string $code): string => $this->pages->indexUrl($prefix, $code));
 
-        return view('atrium-theme::list', [
+        return view($this->pages->view($class ?? $this->pages->sectionModels($prefix)[0], 'index', 'atrium-theme::list'), [
             'title' => $this->pages->label($class ?? $this->pages->sectionModels($prefix)[0]),
             'text' => null,
             'sections' => $sections,
@@ -105,7 +105,7 @@ final class PageController extends Controller
             return $this->section($request, $prefix, $record, $view, $url, $breadcrumbs, $urls, $switch);
         }
 
-        return view('atrium-theme::page', [
+        return view($this->pages->view($record::class, 'page', 'atrium-theme::page'), [
             'page' => $view,
             'canonical' => $url,
             'breadcrumbs' => $breadcrumbs,
@@ -136,7 +136,7 @@ final class PageController extends Controller
             }
         }
 
-        return view('atrium-theme::list', [
+        return view($this->pages->view($section::class, 'section', 'atrium-theme::list'), [
             'title' => $view->title(),
             'page' => $view,
             'text' => $view->body(),

@@ -104,6 +104,18 @@ final class Pages
         ));
     }
 
+    /**
+     * The view that draws a module's page: its own when the model names one
+     * (`public static function themeView(string $page): ?string`, where
+     * `$page` is index, section or page), the theme's otherwise.
+     */
+    public function view(string $class, string $page, string $default): string
+    {
+        $view = method_exists($class, 'themeView') ? $class::themeView($page) : null;
+
+        return is_string($view) && view()->exists($view) ? $view : $default;
+    }
+
     public function label(string $class): string
     {
         return method_exists($class, 'getAdminLabel')
