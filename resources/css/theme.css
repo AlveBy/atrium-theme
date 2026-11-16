@@ -141,3 +141,11 @@ main.wrap { padding-top: 2rem; padding-bottom: 3rem; }
 @media (prefers-reduced-motion: no-preference) {
     a, .theme-toggle { transition: background-color .15s, text-decoration-thickness .15s; }
 }
+
+.error-page { max-width: 40rem; padding: 2rem 0 1rem; }
+.error-code { margin: 0 0 .25rem; color: var(--muted); font-size: clamp(3rem, 2rem + 4vw, 5rem); font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.error-search { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin: 1.5rem 0; }
+.error-search label { flex-basis: 100%; font-weight: 600; }
+.error-search input { flex: 1 1 16rem; min-width: 0; padding: .55rem .75rem; font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--control); border-radius: .4rem; }
+.error-search button { padding: .55rem 1.1rem; font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--control); border-radius: .4rem; cursor: pointer; }
+.error-search button:hover { border-color: var(--text); }

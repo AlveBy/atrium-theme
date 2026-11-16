@@ -14,6 +14,8 @@ use Atrium\Admin\Support\ContentLanguages;
 use Atrium\Admin\Support\PublicUrl;
 use Atrium\Admin\Support\Sitemap;
 use Atrium\Admin\Support\Sites;
+use Atrium\Theme\Errors\ErrorPages;
+use Atrium\Theme\Errors\ErrorViewFinder;
 use Atrium\Theme\Http\Controllers\PageController;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Routing\Route as RoutingRoute;
@@ -21,6 +23,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\View\Factory;
 
 final class ThemeServiceProvider extends ServiceProvider
 {
@@ -28,6 +31,13 @@ final class ThemeServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/../config/atrium-theme.php', 'atrium-theme');
         $this->app->singleton(Pages::class);
+
+        // The theme's error pages, between the app's own and Laravel's.
+        $this->app->extend('view', function (Factory $view): Factory {
+            ErrorViewFinder::install($view, new ErrorPages);
+
+            return $view;
+        });
     }
 
     public function boot(): void
@@ -50,6 +60,16 @@ final class ThemeServiceProvider extends ServiceProvider
                 'homeUrl' => $pages->homeUrl(),
                 'themeStyles' => self::styles(),
             ]);
+        });
+
+        // Every error page, the app's own included, knows the site and its
+        // language, even for an address that matched no route.
+        View::composer(['errors::*', 'atrium-theme::components.error-page'], function (\Illuminate\View\View $view): void {
+            $pages = new ErrorPages;
+
+            if ($pages->themed()) {
+                $view->with($pages->prepare());
+            }
         });
 
         // After every provider and the app's own routes: a route the app
@@ -83,6 +103,12 @@ final class ThemeServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__.'/../resources/views' => resource_path('views/vendor/atrium-theme'),
             ], 'atrium-theme-views');
+
+            // The error pages as a start for the app's own, Laravel's way:
+            // resources/views/errors wins over the theme and stays the app's.
+            $this->publishes([
+                __DIR__.'/../resources/views/errors' => resource_path('views/errors'),
+            ], 'atrium-errors');
         }
     }
 

@@ -96,6 +96,23 @@ public static function themeView(string $page): ?string
 
 The view gets the same data as the theme's own (`records`, `page`, `canonical`, `breadcrumbs`, …), usually `@extends('atrium-theme::layout')`, and may `@push('head')` tags such as structured data into the page's `<head>`.
 
+## Your own error pages
+
+The theme draws 403, 404, 419, 429, 500 and 503 in the site's design and language, and a general page for any other 4xx or 5xx code. The 404 page links home and, when a search package registers the `atrium.search` route, has a search box. A client error keeps the layout with its menu; a server error, or a page whose layout fails, gets a plain frame that reads nothing from the database.
+
+A page of your own wins, the Laravel way, and `composer update` never touches it:
+
+1. `resources/views/errors/{site code}/404.blade.php`, then `…/4xx.blade.php`;
+2. `resources/views/errors/404.blade.php`, then `4xx.blade.php` / `5xx.blade.php`;
+3. the theme's `atrium-theme::errors.404`, then `…4xx` / `…5xx`;
+4. Laravel's own.
+
+```bash
+php artisan vendor:publish --tag=atrium-errors
+```
+
+copies the theme's pages to `resources/views/errors` as a start. They use `<x-atrium-theme::error-page :code="404" :title="…">`; every error page gets `$siteName`, `$homeUrl` and `$searchUrl`. Nothing needs to change in `bootstrap/app.php`: JSON and API requests keep JSON errors, the admin keeps Laravel's pages, and `php artisan down --render="errors::503"` prerenders the theme's 503.
+
 ## Colours
 
 The stylesheet is inline, so there is nothing to build or publish. Every colour is a custom property; override them in a stylesheet of your own after the theme's.
