@@ -10,7 +10,7 @@ Light and dark, readable with any kind of colour vision, in the 15 languages of 
 composer require alveby/atrium-theme
 ```
 
-The theme is on as soon as the package is installed. Tell it which modules have pages in `config/atrium.php` → `public_urls`:
+The theme is on as soon as the package is installed. Routes in your `routes/web.php` win over the theme's, so delete the welcome page route of a new Laravel app to let the theme draw `/`. Tell it which modules have pages in `config/atrium.php` → `public_urls`:
 
 ```php
 'public_urls' => [
