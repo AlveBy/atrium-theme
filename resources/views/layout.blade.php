@@ -16,6 +16,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="generator" content="Atrium">
     <title>{{ $fullTitle }}</title>
     @if (! empty($metaDescription))
     <meta name="description" content="{{ $metaDescription }}">
@@ -81,7 +82,12 @@
     </main>
 
     <footer class="site-footer">
-        <div class="wrap">© {{ now()->year }} {{ $siteName }}</div>
+        <div class="wrap">
+            <span>© {{ now()->year }} {{ $siteName }}</span>
+            @if (config('atrium-theme.credit', true))
+                <a class="credit" href="https://github.com/AlveBy/atrium">{{ __('atrium-theme::theme.credit') }}</a>
+            @endif
+        </div>
     </footer>
 
     <x-atrium::body-end />

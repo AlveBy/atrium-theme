@@ -20,4 +20,5 @@ return [
     'pages' => 'ページ',
     'empty' => 'まだ何もありません。',
     'all' => 'すべて表示',
+    'credit' => 'Atrium で作成',
 ];

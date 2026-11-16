@@ -20,4 +20,5 @@ return [
     'pages' => 'Strony',
     'empty' => 'Na razie nic tu nie ma.',
     'all' => 'Pokaż wszystko',
+    'credit' => 'Zbudowane na Atrium',
 ];

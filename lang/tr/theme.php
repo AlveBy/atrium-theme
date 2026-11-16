@@ -20,4 +20,5 @@ return [
     'pages' => 'Sayfalar',
     'empty' => 'Burada henüz bir şey yok.',
     'all' => 'Tümünü göster',
+    'credit' => 'Atrium ile yapıldı',
 ];

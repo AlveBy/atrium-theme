@@ -32,4 +32,8 @@ return [
     // Views drawn under every record page with $record and $page; a module
     // package (reviews, comments) pushes its own here from its provider.
     'record_views' => [],
+
+    // A small "Made with Atrium" link in the footer. Atrium is free; if it
+    // helped you, please keep it. Set ATRIUM_THEME_CREDIT=false to hide it.
+    'credit' => (bool) env('ATRIUM_THEME_CREDIT', true),
 ];

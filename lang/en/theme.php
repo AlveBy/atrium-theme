@@ -20,4 +20,5 @@ return [
     'pages' => 'Pages',
     'empty' => 'Nothing here yet.',
     'all' => 'Show all',
+    'credit' => 'Made with Atrium',
 ];

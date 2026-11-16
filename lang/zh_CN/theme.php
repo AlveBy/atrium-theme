@@ -20,4 +20,5 @@ return [
     'pages' => '分页',
     'empty' => '这里还没有内容。',
     'all' => '查看全部',
+    'credit' => '使用 Atrium 构建',
 ];

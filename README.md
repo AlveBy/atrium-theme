@@ -61,6 +61,9 @@ Other settings (`php artisan vendor:publish --tag=atrium-theme-config`):
 | `per_page` | `20` | records per page in a list |
 | `home_items` | `3` | records of each module on the home page |
 | `record_views` | `[]` | views drawn under every record page with `$record` and `$page`; module packages such as `alveby/atrium-reviews` add theirs |
+| `credit` | `true` | a small "Made with Atrium" link in the footer (`ATRIUM_THEME_CREDIT=false` hides it) |
+
+Every page also carries `<meta name="generator" content="Atrium">`. Atrium is free under the MIT License; if it helped you, please keep the "Made with Atrium" link in the footer. It is a request, not a condition.
 
 ## Change the look
 

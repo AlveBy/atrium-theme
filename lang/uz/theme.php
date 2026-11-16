@@ -20,4 +20,5 @@ return [
     'pages' => 'Sahifalar',
     'empty' => 'Hozircha bu yerda hech narsa yo‘q.',
     'all' => 'Hammasini ko‘rsatish',
+    'credit' => 'Atrium asosida yaratilgan',
 ];
