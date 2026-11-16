@@ -1,4 +1,9 @@
 /*
+ * This file is part of Atrium (https://github.com/AlveBy/atrium).
+ * Copyright (c) 2026 AlveBy. Licensed under the MIT License, see LICENSE.
+ */
+
+/*
  * Atrium neutral theme. Every colour is a custom property: override them in
  * a stylesheet of your own after this one. Pairs used for text keep a WCAG
  * contrast of at least 4.5:1, borders of controls at least 3:1

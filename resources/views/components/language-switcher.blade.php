@@ -1,4 +1,8 @@
 {{--
+    This file is part of Atrium (https://github.com/AlveBy/atrium).
+    Copyright (c) 2026 AlveBy. Licensed under the MIT License, see LICENSE.
+--}}
+{{--
     Links to this page in the site's other languages.
 
     <x-atrium-theme::language-switcher :urls="['en' => $enUrl, 'de' => $deUrl]" />

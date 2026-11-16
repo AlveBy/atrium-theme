@@ -1,4 +1,8 @@
 {{--
+    This file is part of Atrium (https://github.com/AlveBy/atrium).
+    Copyright (c) 2026 AlveBy. Licensed under the MIT License, see LICENSE.
+--}}
+{{--
     The page frame of the theme. Publish the views (vendor:publish
     --tag=atrium-theme-views) to change it; colours are custom properties
     in the stylesheet below, override them in a stylesheet of your own.

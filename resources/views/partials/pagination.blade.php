@@ -1,3 +1,7 @@
+{{--
+    This file is part of Atrium (https://github.com/AlveBy/atrium).
+    Copyright (c) 2026 AlveBy. Licensed under the MIT License, see LICENSE.
+--}}
 @if ($paginator->hasPages())
     <nav class="pagination" aria-label="{{ __('atrium-theme::theme.pages') }}">
         @if ($url = $paginator->previousPageUrl())

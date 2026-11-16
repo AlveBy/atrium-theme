@@ -1,4 +1,8 @@
 {{--
+    This file is part of Atrium (https://github.com/AlveBy/atrium).
+    Copyright (c) 2026 AlveBy. Licensed under the MIT License, see LICENSE.
+--}}
+{{--
     Light or dark. Follows the system until the visitor chooses; the choice
     is kept in localStorage and applied before the page is drawn (see the
     script in the layout's <head>).
