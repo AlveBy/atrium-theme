@@ -1,0 +1,40 @@
+{{-- One part of a record: properties, a text, pictures or files. --}}
+@switch($block['kind'])
+    @case('properties')
+        <dl class="properties">
+            @foreach ($block['items'] as $item)
+                <dt>{{ $item['label'] }}</dt>
+                <dd>@if ($item['url'])<a href="{{ $item['url'] }}">{{ $item['value'] }}</a>@else{{ $item['value'] }}@endif</dd>
+            @endforeach
+        </dl>
+        @break
+
+    @case('html')
+        <section>
+            <h2>{{ $block['label'] }}</h2>
+            <div class="content">{!! $block['html'] !!}</div>
+        </section>
+        @break
+
+    @case('images')
+        <section>
+            <h2>{{ $block['label'] }}</h2>
+            <div class="gallery">
+                @foreach ($block['images'] as $image)
+                    <a href="{{ $image }}"><img src="{{ $image }}" alt="{{ $block['label'] }} {{ $loop->iteration }}" loading="lazy"></a>
+                @endforeach
+            </div>
+        </section>
+        @break
+
+    @case('files')
+        <section>
+            <h2>{{ $block['label'] }}</h2>
+            <ul class="files">
+                @foreach ($block['files'] as $file)
+                    <li><a href="{{ $file['url'] }}" download>{{ $file['name'] }}</a></li>
+                @endforeach
+            </ul>
+        </section>
+        @break
+@endswitch

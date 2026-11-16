@@ -1,0 +1,136 @@
+/*
+ * Atrium neutral theme. Every colour is a custom property: override them in
+ * a stylesheet of your own after this one. Pairs used for text keep a WCAG
+ * contrast of at least 4.5:1, borders of controls at least 3:1
+ * (packages/theme/tests/ContrastTest.php checks it). Links are underlined, so
+ * they never depend on colour alone.
+ */
+:root {
+    color-scheme: light;
+    --bg: #ffffff;
+    --surface: #f3f4f6;
+    --text: #16181d;
+    --muted: #4f5662;
+    --accent: #1d4ed8;
+    --control: #6b7280;
+    --line: #e2e5ea;
+    --focus: #1d4ed8;
+}
+
+:root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #121418;
+    --surface: #1d2026;
+    --text: #e9ebef;
+    --muted: #a9b0bb;
+    --accent: #8db4ff;
+    --control: #858d99;
+    --line: #2c3038;
+    --focus: #8db4ff;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --bg: #121418;
+        --surface: #1d2026;
+        --text: #e9ebef;
+        --muted: #a9b0bb;
+        --accent: #8db4ff;
+        --control: #858d99;
+        --line: #2c3038;
+        --focus: #8db4ff;
+    }
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 1rem/1.6 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+a { color: var(--accent); text-decoration: underline; text-underline-offset: .15em; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+img { max-width: 100%; height: auto; }
+
+h1, h2, h3 { line-height: 1.25; margin: 0 0 .5em; }
+h1 { font-size: clamp(1.75rem, 1.4rem + 1.5vw, 2.5rem); }
+h2 { font-size: 1.4rem; margin-top: 1.5em; }
+
+.skip { position: absolute; left: -9999px; }
+.skip:focus { left: 1rem; top: 1rem; background: var(--bg); padding: .5rem 1rem; z-index: 10; }
+
+.wrap { max-width: 72rem; margin: 0 auto; padding: 0 1.25rem; }
+
+.site-header { border-bottom: 1px solid var(--line); }
+.site-header .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 1.5rem; padding-top: 1rem; padding-bottom: 1rem; }
+.site-name { font-weight: 700; font-size: 1.15rem; color: var(--text); text-decoration: none; margin-right: auto; }
+.site-name:hover { text-decoration: underline; }
+
+.menu ul, .languages ul, .breadcrumbs ol { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .25rem 1rem; }
+.menu a[aria-current="page"], .languages a[aria-current="true"] { font-weight: 700; text-decoration-thickness: 2px; }
+
+.theme-toggle {
+    font: inherit; font-size: .9rem; color: var(--text); background: transparent;
+    border: 1px solid var(--control); border-radius: .4rem; padding: .3rem .7rem; cursor: pointer;
+}
+.theme-toggle:hover { background: var(--surface); }
+.theme-toggle .when-dark { display: none; }
+:root[data-theme="dark"] .theme-toggle .when-dark { display: inline; }
+:root[data-theme="dark"] .theme-toggle .when-light { display: none; }
+
+main.wrap { padding-top: 2rem; padding-bottom: 3rem; }
+
+.breadcrumbs { font-size: .9rem; color: var(--muted); margin-bottom: 1rem; }
+.breadcrumbs li + li::before { content: "/"; margin-right: 1rem; color: var(--muted); }
+
+.date { color: var(--muted); font-size: .95rem; margin: 0 0 1rem; }
+
+.lead-image { display: block; margin: 0 0 1.5rem; border-radius: .5rem; }
+
+.content { max-width: 46rem; }
+.content table { border-collapse: collapse; width: 100%; }
+.content th, .content td { border: 1px solid var(--line); padding: .4rem .6rem; text-align: left; }
+
+.properties { display: grid; grid-template-columns: minmax(8rem, max-content) 1fr; gap: .4rem 1.5rem; margin: 1.5rem 0; padding: 1rem 1.25rem; background: var(--surface); border-radius: .5rem; }
+.properties dt { color: var(--muted); }
+.properties dd { margin: 0; }
+
+.gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr)); gap: .75rem; }
+.gallery img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: .4rem; }
+
+.files { padding-left: 1.25rem; }
+
+.sections { list-style: none; padding: 0; margin: 0 0 2rem; display: flex; flex-wrap: wrap; gap: .5rem; }
+.sections a { display: inline-block; padding: .35rem .8rem; border: 1px solid var(--control); border-radius: 2rem; }
+
+.cards { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr)); gap: 1.25rem; }
+.card { background: var(--surface); border-radius: .6rem; overflow: hidden; display: flex; flex-direction: column; }
+.card img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; }
+.card-body { padding: 1rem 1.1rem 1.2rem; }
+.card h2, .card h3 { font-size: 1.1rem; margin: 0 0 .4rem; }
+.card .date { font-size: .85rem; margin-bottom: .4rem; }
+.card-text { color: var(--muted); font-size: .95rem; }
+.card-text > :last-child { margin-bottom: 0; }
+
+.module + .module { margin-top: 2.5rem; }
+.module-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: .5rem 1.5rem; margin-bottom: 1rem; }
+.module-head h2 { margin: 0; }
+
+.pagination { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; margin-top: 2rem; }
+.pagination .current { color: var(--muted); }
+
+.empty { color: var(--muted); }
+
+.site-footer { border-top: 1px solid var(--line); color: var(--muted); font-size: .9rem; padding: 1.5rem 0; }
+
+@media (prefers-reduced-motion: no-preference) {
+    a, .theme-toggle { transition: background-color .15s, text-decoration-thickness .15s; }
+}
