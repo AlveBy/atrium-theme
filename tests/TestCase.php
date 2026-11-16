@@ -39,6 +39,8 @@ abstract class TestCase extends Orchestra
         $target = env('DB_CONNECTION');
         $config->set('database.default', in_array($target, ['mysql', 'pgsql'], true) ? $target : 'testing');
         $config->set('atrium.seo.title_suffix', ' | Demo shop');
+        // The repository's .env.example turns the demo on; only DemoSiteTest wants it.
+        $config->set('atrium.demo', false);
         $config->set('atrium.public_urls', [
             Product::class => ['prefix' => 'catalog', 'tree' => ProductSection::class, 'parent' => 'section_id'],
             ProductSection::class => ['prefix' => 'catalog', 'tree' => ProductSection::class, 'parent' => 'parent_id'],
