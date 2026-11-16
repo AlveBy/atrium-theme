@@ -107,6 +107,10 @@ vendor/bin/phpunit packages/theme/tests
 
 The tests set up a made-up catalog (sections, products with every field type, a translated blog) and check the pages, addresses, redirects, languages and the sitemap on SQLite, MySQL and PostgreSQL.
 
+## Contributing
+
+This repository is a read-only copy of `packages/theme` in [AlveBy/atrium](https://github.com/AlveBy/atrium). Issues and pull requests go there.
+
 ## License
 
 MIT

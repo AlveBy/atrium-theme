@@ -4,6 +4,10 @@
     "type": "library",
     "license": "MIT",
     "homepage": "https://github.com/AlveBy/atrium",
+    "support": {
+        "issues": "https://github.com/AlveBy/atrium/issues",
+        "source": "https://github.com/AlveBy/atrium"
+    },
     "keywords": [
         "laravel",
         "admin",
@@ -16,7 +20,7 @@
     "require": {
         "php": "^8.3",
         "illuminate/support": "^13.0",
-        "alveby/atrium": "@dev"
+        "alveby/atrium": "^0.1"
     },
     "require-dev": {
         "orchestra/testbench": "^11.0",
@@ -37,14 +41,11 @@
             "providers": [
                 "Atrium\\Theme\\ThemeServiceProvider"
             ]
+        },
+        "branch-alias": {
+            "dev-main": "0.1.x-dev"
         }
     },
     "minimum-stability": "dev",
-    "prefer-stable": true,
-    "repositories": [
-        {
-            "type": "path",
-            "url": "../admin"
-        }
-    ]
+    "prefer-stable": true
 }
