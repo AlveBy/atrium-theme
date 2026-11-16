@@ -61,15 +61,11 @@
             <a class="site-name" href="{{ $homeUrl }}">{{ $siteName }}</a>
             @endif
 
-            @if ($menu !== [])
-                <nav class="menu" aria-label="{{ __('atrium-theme::theme.menu') }}">
-                    <ul>
-                        @foreach ($menu as $item)
-                            <li><a href="{{ $item['url'] }}" @if (request()->route('prefix') === $item['prefix']) aria-current="page" @endif>{{ $item['label'] }}</a></li>
-                        @endforeach
-                    </ul>
-                </nav>
-            @endif
+            @include((string) (config('atrium-theme.header_menu') ?: 'atrium-theme::partials.menu'))
+
+            @foreach ((array) config('atrium-theme.header_views', []) as $headerView)
+                @include($headerView)
+            @endforeach
 
             <x-atrium-theme::language-switcher :urls="$switch ?? []" />
             <x-atrium-theme::theme-toggle />
@@ -99,6 +95,9 @@
             @include($skin->view('footer'))
         @else
         <div class="wrap">
+            @if (config('atrium-theme.footer_menu'))
+                @include((string) config('atrium-theme.footer_menu'))
+            @endif
             <span>© {{ now()->year }} {{ $siteName }}</span>
             @if (config('atrium-theme.credit', true))
                 <a class="credit" href="https://github.com/AlveBy/atrium">{{ __('atrium-theme::theme.credit') }}</a>

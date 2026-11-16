@@ -13,6 +13,7 @@ use Atrium\Admin\Cache\RecordCache;
 use Atrium\Admin\Contracts\Sitemapable;
 use Atrium\Admin\Support\ContentLanguages;
 use Atrium\Admin\Support\PublicUrl;
+use Atrium\Admin\Support\RecordUrls;
 use Atrium\Admin\Support\Sitemap;
 use Atrium\Admin\Support\Sites;
 use Atrium\Theme\Errors\ErrorPages;
@@ -125,6 +126,18 @@ final class ThemeServiceProvider extends ServiceProvider
                 }
 
                 return $data;
+            });
+        });
+
+        // Other modules (menus, search) ask the core for a record's page;
+        // the pages under a prefix are the theme's.
+        $this->callAfterResolving(RecordUrls::class, function (RecordUrls $urls): void {
+            $urls->extend(function (Model $record, ?string $language): string|false|null {
+                if (($rule = PublicUrl::ruleFor($record::class)) === null || $rule['prefix'] === '') {
+                    return null;
+                }
+
+                return $this->app->make(Pages::class)->url($record, $language) ?? false;
             });
         });
 

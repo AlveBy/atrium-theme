@@ -56,4 +56,15 @@ return [
     // A small "Made with Atrium" link in the footer. Atrium is free; if it
     // helped you, please keep it. Set ATRIUM_THEME_CREDIT=false to hide it.
     'credit' => (bool) env('ATRIUM_THEME_CREDIT', true),
+
+    // The view drawn as the header menu. Null: a link to each module with
+    // pages. The menus module sets its own when it is installed.
+    'header_menu' => null,
+
+    // The view drawn above the copyright line in the footer, or null.
+    'footer_menu' => null,
+
+    // Views drawn in the header after the menu; the search module pushes
+    // its search box here.
+    'header_views' => [],
 ];
