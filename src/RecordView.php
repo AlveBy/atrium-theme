@@ -175,7 +175,7 @@ final class RecordView
                     $last = array_key_last($blocks);
                 }
 
-                $blocks[$last]['items'][] = ['label' => $block['label'], 'value' => $block['value'], 'url' => $block['url']];
+                $blocks[$last]['items'][] = ['label' => $block['label'], 'value' => $block['value'], 'url' => $block['url'], 'links' => $block['links'] ?? []];
 
                 continue;
             }
@@ -313,7 +313,9 @@ final class RecordView
             'kind' => 'property',
             'label' => $field->getLabel(),
             'value' => implode(', ', array_column($items, 'value')),
-            'url' => count($items) === 1 ? $items[0]['url'] : null,
+            'url' => null,
+            // Each related record is a link of its own.
+            'links' => $items,
         ];
     }
 

@@ -4,7 +4,11 @@
         <dl class="properties">
             @foreach ($block['items'] as $item)
                 <dt>{{ $item['label'] }}</dt>
-                <dd>@if ($item['url'])<a href="{{ $item['url'] }}">{{ $item['value'] }}</a>@else{{ $item['value'] }}@endif</dd>
+                @if ($item['links'])
+                    <dd>@foreach ($item['links'] as $link)@if ($link['url'])<a href="{{ $link['url'] }}">{{ $link['value'] }}</a>@else{{ $link['value'] }}@endif{{ $loop->last ? '' : ', ' }}@endforeach</dd>
+                @else
+                    <dd>@if ($item['url'])<a href="{{ $item['url'] }}">{{ $item['value'] }}</a>@else{{ $item['value'] }}@endif</dd>
+                @endif
             @endforeach
         </dl>
         @break
