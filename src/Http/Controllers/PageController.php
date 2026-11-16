@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Atrium\Theme\Http\Controllers;
 
+use Atrium\Admin\Facades\Setting;
+use Atrium\Admin\Modules\Modules;
 use Atrium\Admin\Support\ContentLanguages;
 use Atrium\Admin\Support\PublicUrl;
 use Atrium\Theme\Pages;
@@ -210,11 +212,17 @@ final class PageController extends Controller
     }
 
     /**
+     * As many records a page as the module's `per_page` setting says, if it
+     * has one, or `atrium-theme.per_page`.
+     *
      * @param  Builder<Model>  $query
      */
     private function paginate($query): LengthAwarePaginator
     {
-        $page = $query->paginate((int) config('atrium-theme.per_page', 20))->withQueryString();
+        $module = app(Modules::class)->ownerOf($query->getModel()::class);
+        $perPage = (int) ($module === null ? null : Setting::get($module->key().'.per_page')) ?: (int) config('atrium-theme.per_page', 20);
+
+        $page = $query->paginate($perPage)->withQueryString();
         $page->setCollection($page->getCollection()->map(fn (Model $record): RecordView => new RecordView($record, $this->pages)));
 
         return $page;
