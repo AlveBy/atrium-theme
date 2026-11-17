@@ -423,16 +423,12 @@ final class RecordView
         // The relation behind the field, when it is loaded (cards load it
         // for every record at once); a query otherwise.
         $relation = Str::camel(Str::beforeLast($field->getColumn(), '_id'));
-        $loaded = $field->getValueColumn() === 'id' && $relation !== $field->getColumn() && $this->record->relationLoaded($relation)
-            ? $this->record->getRelation($relation)
-            : false;
-
         /** @var class-string<Model> $class */
-        $related = $loaded instanceof Model || $loaded === null
-            ? $loaded
+        $related = $field->getValueColumn() === 'id' && $relation !== $field->getColumn() && $this->record->relationLoaded($relation)
+            ? $this->record->getRelation($relation)
             : $this->pages->linked($class, $field->getValueColumn(), $value);
 
-        if ($related === null) {
+        if (! $related instanceof Model) {
             return null;
         }
 

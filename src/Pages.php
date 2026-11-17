@@ -39,7 +39,7 @@ final class Pages
     /** How many records one code may match before the lenient lookup gives up. */
     private const MAX_CANDIDATES = 50;
 
-    /** @var array<string,Model|null> linked records, for preloadLinks() */
+    /** @var array<class-string<Model>,array<string,array<int|string,Model|null>>> linked records by model, column and value, for preloadLinks() */
     private array $links = [];
 
     /** @var array<string,array<string,true>> */
@@ -336,7 +336,7 @@ final class Pages
 
         $relations = [];
 
-        foreach ((array) $class::getAdministrationFields() as $field) {
+        foreach ($class::getAdministrationFields() as $field) {
             if (! $field instanceof BelongsToField || ($class = $field->getModelClass()) === null) {
                 continue;
             }
@@ -352,7 +352,7 @@ final class Pages
             $values = $records->map(fn (Model $record): mixed => $record->getAttribute($field->getColumn()))
                 ->filter(fn (mixed $value): bool => is_scalar($value) && $value !== '')
                 ->unique()
-                ->reject(fn (mixed $value): bool => array_key_exists($this->linkKey($class, $field->getValueColumn(), $value), $this->links))
+                ->reject(fn (mixed $value): bool => array_key_exists($value, $this->links[$class][$field->getValueColumn()] ?? []))
                 ->values()
                 ->all();
 
@@ -361,14 +361,14 @@ final class Pages
             }
 
             foreach ($values as $value) {
-                $this->links[$this->linkKey($class, $field->getValueColumn(), $value)] = null;
+                $this->links[$class][$field->getValueColumn()][$value] = null;
             }
 
             /** @var class-string<Model> $modelClass */
             $modelClass = $class;
 
             foreach ($modelClass::query()->whereIn($field->getValueColumn(), $values)->get() as $related) {
-                $this->links[$this->linkKey($class, $field->getValueColumn(), $related->getAttribute($field->getValueColumn()))] = $related;
+                $this->links[$class][$field->getValueColumn()][$related->getAttribute($field->getValueColumn())] = $related;
             }
         }
 
@@ -385,9 +385,9 @@ final class Pages
      */
     public function linked(string $class, string $column, mixed $value): ?Model
     {
-        $key = $this->linkKey($class, $column, $value);
+        $links = $this->links[$class][$column] ?? [];
 
-        return array_key_exists($key, $this->links) ? $this->links[$key] : $class::query()->where($column, $value)->first();
+        return array_key_exists($value, $links) ? $links[$value] : $class::query()->where($column, $value)->first();
     }
 
     /**
@@ -396,11 +396,6 @@ final class Pages
     public function forgetLinks(): void
     {
         $this->links = [];
-    }
-
-    private function linkKey(string $class, string $column, mixed $value): string
-    {
-        return $class.'|'.$column.'|'.(string) $value;
     }
 
     /**
