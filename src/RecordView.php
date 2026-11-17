@@ -11,6 +11,7 @@ namespace Atrium\Theme;
 
 use Atrium\Admin\Fields\BelongsToField;
 use Atrium\Admin\Fields\Field;
+use Atrium\Admin\Support\Cdn;
 use Atrium\Admin\Support\MediaUrl;
 use Atrium\Admin\Support\PublicUrl;
 use DateTimeInterface;
@@ -395,7 +396,8 @@ final class RecordView
             return null;
         }
 
-        return new HtmlString($this->record->getAttribute($attribute.'_type') === 'text' ? nl2br(e($text)) : $text);
+        // Pictures and files inside the text come through the CDN too.
+        return new HtmlString($this->record->getAttribute($attribute.'_type') === 'text' ? nl2br(e($text)) : Cdn::html($text));
     }
 
     /**

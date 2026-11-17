@@ -143,6 +143,27 @@ final class PagesTest extends TestCase
             ->assertDontSee('Meta title');
     }
 
+    public function test_with_a_cdn_pictures_texts_and_files_come_from_it_in_sizes(): void
+    {
+        config(['atrium.cdn.url' => 'https://cdn.test', 'atrium.cdn.images.driver' => 'cloudflare']);
+        $this->laptop->update(['detail_text' => '<p><img src="/upload/iblock/1/inline.jpg" alt=""></p>']);
+
+        $this->get('/catalog/computers/laptops/laptop-pro')
+            ->assertOk()
+            // The lead picture: a sensible default and a srcset to choose from.
+            ->assertSee('class="lead-image" src="https://cdn.test/cdn-cgi/image/width=1280,quality=82,format=auto/upload/iblock/1/laptop.jpg"', false)
+            ->assertSee('https://cdn.test/cdn-cgi/image/width=320,quality=82,format=auto/upload/iblock/1/laptop.jpg 320w', false)
+            ->assertSee('sizes="(min-width: 72rem) 70rem, 100vw"', false)
+            // Gallery thumbnails resized, the link to the full picture is not.
+            ->assertSee('<a href="https://cdn.test/upload/iblock/1/a.jpg"><img src="https://cdn.test/cdn-cgi/image/width=640,quality=82,format=auto/upload/iblock/1/a.jpg"', false)
+            ->assertSee('<img src="https://cdn.test/upload/iblock/1/inline.jpg"', false)
+            ->assertSee('href="https://cdn.test/upload/iblock/1/manual%20v2.pdf"', false)
+            ->assertSee('<meta property="og:image" content="https://cdn.test/upload/iblock/1/laptop.jpg">', false);
+
+        $this->get('/catalog/computers/laptops')
+            ->assertSee('srcset="https://cdn.test/cdn-cgi/image/width=320', false);
+    }
+
     public function test_plain_text_is_escaped_and_keeps_its_line_breaks(): void
     {
         $this->laptop->update(['detail_text' => null]);

@@ -8,7 +8,7 @@
         @continue(! ($url = $record->url()))
         <li class="card">
             @if ($image = $record->thumbnail())
-                <img src="{{ $image }}" alt="" loading="lazy">
+                <img src="{{ \Atrium\Admin\Support\Cdn::image($image, 640) }}" @if ($srcset = \Atrium\Admin\Support\Cdn::srcset($image, 1280)) srcset="{{ $srcset }}" sizes="(min-width: 72rem) 22rem, (min-width: 36rem) 50vw, 100vw" @endif alt="" loading="lazy">
             @endif
             <div class="card-body">
                 @if ($date = $record->date())

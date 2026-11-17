@@ -19,7 +19,7 @@
         @endif
 
         @if ($image = $page->image())
-            <img class="lead-image" src="{{ $image }}" alt="{{ $page->title() }}">
+            <img class="lead-image" src="{{ \Atrium\Admin\Support\Cdn::image($image, 1280) }}" @if ($srcset = \Atrium\Admin\Support\Cdn::srcset($image)) srcset="{{ $srcset }}" sizes="(min-width: 72rem) 70rem, 100vw" @endif alt="{{ $page->title() }}">
         @endif
 
         @if ($body = $page->body())

@@ -29,7 +29,7 @@
             <h2>{{ $block['label'] }}</h2>
             <div class="gallery">
                 @foreach ($block['images'] as $image)
-                    <a href="{{ $image }}"><img src="{{ $image }}" alt="{{ $block['label'] }} {{ $loop->iteration }}" loading="lazy"></a>
+                    <a href="{{ $image }}"><img src="{{ \Atrium\Admin\Support\Cdn::image($image, 640) }}" alt="{{ $block['label'] }} {{ $loop->iteration }}" loading="lazy"></a>
                 @endforeach
             </div>
         </section>
