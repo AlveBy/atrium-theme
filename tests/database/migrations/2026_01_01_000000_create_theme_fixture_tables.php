@@ -93,5 +93,29 @@ return new class extends Migration
             $table->unsignedBigInteger('keeper')->nullable();
             $table->timestamps();
         });
+
+        // Modules of the controller tests: a second tree, and records of
+        // their own that stand in a tree.
+        Schema::create('crates', function (Blueprint $table): void {
+            $table->id();
+            $table->foreignId('parent_id')->nullable();
+            $table->string('name');
+            $table->string('code');
+            $table->boolean('active')->default(true);
+            $table->integer('sort')->default(500);
+            $table->timestamps();
+        });
+
+        foreach (['accessories', 'spares'] as $name) {
+            Schema::create($name, function (Blueprint $table): void {
+                $table->id();
+                $table->foreignId('section_id')->nullable();
+                $table->string('name');
+                $table->string('code');
+                $table->boolean('active')->default(true);
+                $table->integer('sort')->default(500);
+                $table->timestamps();
+            });
+        }
     }
 };
