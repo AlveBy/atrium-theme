@@ -298,7 +298,7 @@ final class Pages
      */
     public function columns(Model $model): array
     {
-        $table = $model->getConnectionName().'|'.$model->getTable();
+        $table = implode('|', [$model->getConnectionName(), $model->getTable()]);
 
         return $this->columns[$table] ??= array_fill_keys(
             Schema::connection($model->getConnectionName())->getColumnListing($model->getTable()),

@@ -53,7 +53,7 @@ final class ErrorViewFinder extends FileViewFinder
         $self->hints = $finder->hints;
         $self->views = $finder->views;
         $self->pages = $pages;
-        $self->framework = (string) realpath(dirname((string) (new \ReflectionClass(RegisterErrorViewPaths::class))->getFileName()).'/views');
+        $self->framework = dirname((string) (new \ReflectionClass(RegisterErrorViewPaths::class))->getFileName()).'/views';
 
         $view->setFinder($self);
     }
@@ -86,7 +86,7 @@ final class ErrorViewFinder extends FileViewFinder
         }
 
         $group = $code[0].'xx';
-        $app = array_values(array_filter($this->hints['errors'], fn (string $path): bool => $path !== $this->framework));
+        $app = array_filter($this->hints['errors'], fn (string $path): bool => $path !== $this->framework);
         $site = $this->pages->siteCode();
 
         $candidates = preg_match('/^[A-Za-z0-9_-]+$/', $site) === 1

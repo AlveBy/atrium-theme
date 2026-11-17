@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Atrium\Theme;
 
 use Atrium\Admin\Fields\BelongsToField;
+use Atrium\Admin\Fields\BelongsToManyField;
 use Atrium\Admin\Fields\Field;
 use Atrium\Admin\Support\Cdn;
 use Atrium\Admin\Support\MediaUrl;
@@ -45,7 +46,7 @@ final class RecordView
      */
     private const NOT_SHOWN = ['slug', 'checkbox', 'map', 'treeSelect', 'color'];
 
-    /** @var array<int,Field>|null */
+    /** @var array<int|string,Field>|null */
     private ?array $fields = null;
 
     public function __construct(
@@ -200,7 +201,7 @@ final class RecordView
         $label = $field->getLabel();
         $type = $field->getType();
 
-        if ($type === 'belongsToMany') {
+        if ($field instanceof BelongsToManyField) {
             return $this->linksBlock($field);
         }
 
@@ -231,8 +232,8 @@ final class RecordView
             $labels = [];
 
             foreach ($props['options'] as $option) {
-                if (is_array($option) && array_key_exists('value', $option)) {
-                    $labels[(string) $option['value']] = (string) ($option['label'] ?? $option['value']);
+                if (array_key_exists('value', $option)) {
+                    $labels[(string) $option['value']] = $option['label'] ?? $option['value'];
                 }
             }
 
@@ -252,7 +253,7 @@ final class RecordView
 
                 return $type === 'date' ? $date->isoFormat('LL') : $date->isoFormat('LLL');
             } catch (Throwable) {
-                return (string) (is_scalar($value) ? $value : '');
+                // Not a date anybody can read: shown as it is, below.
             }
         }
 
@@ -292,7 +293,7 @@ final class RecordView
     /**
      * @return array<string,mixed>|null
      */
-    private function linksBlock(Field $field): ?array
+    private function linksBlock(BelongsToManyField $field): ?array
     {
         $name = $field->getName();
 
@@ -300,11 +301,10 @@ final class RecordView
             return null;
         }
 
-        $display = $field instanceof BelongsToField ? $field->getDisplayColumn() : 'name';
         $items = [];
 
         foreach ($relation->get() as $item) {
-            $text = $this->pages->text($item, $display);
+            $text = $this->pages->text($item, $field->getDisplayColumn());
 
             if ($text !== '') {
                 $items[] = ['value' => $text, 'url' => $this->linkTo($item)];
@@ -407,23 +407,19 @@ final class RecordView
      */
     private function skippedColumns(): array
     {
-        $rule = PublicUrl::ruleFor($this->record::class);
+        $parent = PublicUrl::ruleFor($this->record::class)['parent'] ?? null;
 
-        return array_merge(self::OWN_PLACE, array_filter([$rule['parent'] ?? null]));
+        return $parent === null ? self::OWN_PLACE : [...self::OWN_PLACE, $parent];
     }
 
     /**
-     * @return array<int,Field>
+     * @return array<int|string,Field>
      */
     private function fields(): array
     {
-        if ($this->fields !== null) {
-            return $this->fields;
-        }
-
         $class = $this->record::class;
-        $fields = method_exists($class, 'getAdministrationFields') ? (array) $class::getAdministrationFields() : [];
+        $fields = method_exists($class, 'getAdministrationFields') ? $class::getAdministrationFields() : [];
 
-        return $this->fields = array_values(array_filter($fields, static fn (mixed $field): bool => $field instanceof Field));
+        return $this->fields ??= array_filter($fields, static fn (mixed $field): bool => $field instanceof Field);
     }
 }

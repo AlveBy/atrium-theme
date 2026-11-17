@@ -14,6 +14,7 @@ use Atrium\Admin\Support\ContentLanguages;
 use Atrium\Admin\Support\PublicUrl;
 use Atrium\Theme\Pages;
 use Atrium\Theme\Tests\Fixtures\Brand;
+use Atrium\Theme\Tests\Fixtures\Numbered;
 use Atrium\Theme\Tests\Fixtures\Post;
 use Atrium\Theme\Tests\Fixtures\Product;
 use Atrium\Theme\Tests\Fixtures\ProductSection;
@@ -70,6 +71,7 @@ final class PagesInternalsTest extends TestCase
         $this->assertSame('Products', $this->pages->label(Product::class));
         $this->assertSame('Brands', $this->pages->label(Brand::class));
         $this->assertSame('Std Classes', $this->pages->label(stdClass::class));
+        $this->assertSame('7', $this->pages->label(Numbered::class));
     }
 
     private function language(): void
@@ -260,5 +262,6 @@ final class PagesInternalsTest extends TestCase
         $this->assertSame($first, $again);
         $this->assertSame(['id' => true, 'title' => true], $this->pages->columns($other));
         $this->assertArrayHasKey('active', $this->pages->columns(new Product));
+        $this->assertSame(['|products', 'other|products'], array_keys((new \ReflectionProperty($this->pages, 'columns'))->getValue($this->pages)));
     }
 }

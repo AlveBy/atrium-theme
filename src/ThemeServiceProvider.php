@@ -20,6 +20,7 @@ use Atrium\Theme\Http\Controllers\PageController;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Routing\Route as RoutingRoute;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
@@ -56,7 +57,7 @@ final class ThemeServiceProvider extends ServiceProvider
 
             $view->with([
                 'menu' => $menu,
-                'siteName' => (string) ($this->app->make(Sites::class)->current()->name ?: config('app.name')),
+                'siteName' => $this->app->make(Sites::class)->current()->name ?: config('app.name'),
                 'homeUrl' => $pages->homeUrl(),
                 'themeStyles' => self::styles(),
             ]);
@@ -117,9 +118,7 @@ final class ThemeServiceProvider extends ServiceProvider
      */
     public static function styles(): string
     {
-        static $styles = null;
-
-        return $styles ??= (string) file_get_contents(__DIR__.'/../resources/css/theme.css');
+        return once(static fn (): string => File::get(__DIR__.'/../resources/css/theme.css'));
     }
 
     private function registerRoutes(): void
@@ -168,7 +167,7 @@ final class ThemeServiceProvider extends ServiceProvider
         foreach ($pages->modules() as $module) {
             foreach (array_keys($module) as $class) {
                 if (! is_subclass_of($class, Sitemapable::class)) {
-                    yield from $pages->visible($class)->lazy(500);
+                    yield from $pages->visible($class)->lazy();
                 }
             }
         }

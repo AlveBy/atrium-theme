@@ -119,6 +119,20 @@ final class ErrorInternalsTest extends TestCase
         $this->assertSame('', (new ErrorPages)->prepare()['siteName']);
     }
 
+    public function test_with_the_database_down_and_no_name_of_the_app_the_page_has_an_empty_one(): void
+    {
+        config(['app.name' => null]);
+        $this->app->instance('request', new class extends Request
+        {
+            public function segment($index, $default = null): never
+            {
+                throw new RuntimeException('The database is down');
+            }
+        });
+
+        $this->assertSame('', (new ErrorPages)->prepare()['siteName']);
+    }
+
     public function test_with_the_database_down_the_page_has_what_is_known(): void
     {
         $this->app->instance('request', new class extends Request
@@ -169,6 +183,32 @@ final class ErrorInternalsTest extends TestCase
         $this->assertTrue(View::exists('errors::599'));
         $this->assertTrue(View::exists('errors::100'));
         $this->assertFalse(View::exists('errors::600'));
+    }
+
+    /**
+     * @return array<string,array{string,string,bool}>
+     */
+    public static function siteCodes(): array
+    {
+        return [
+            'letters, digits, a dash and an underscore' => ['shop-2_b', 'shop-2_b/404', true],
+            'a dot makes a folder of the code' => ['a.b', 'a/b/404', false],
+            'a slash is not a code' => ['a/b', 'a/b/404', false],
+            'a space is not a code' => ['a b', 'a b/404', false],
+            'a code that only ends well' => ['x.shop', 'x/shop/404', false],
+        ];
+    }
+
+    #[DataProvider('siteCodes')]
+    public function test_only_a_plain_site_code_names_a_folder_of_pages(string $code, string $page, bool $found): void
+    {
+        $site = Site::query()->create(['code' => $code, 'name' => 'Odd', 'folder' => 'odd']);
+        app(Sites::class)->flush();
+        app(Sites::class)->setCurrent($site);
+        $this->request('/admin/users');
+        $this->page($page, 'The page of the site');
+
+        $this->assertSame($found, str_contains(View::make('errors::404')->render(), 'The page of the site'));
     }
 
     private function page(string $name, string $text): void

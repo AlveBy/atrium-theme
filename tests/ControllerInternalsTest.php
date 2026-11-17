@@ -97,6 +97,21 @@ final class ControllerInternalsTest extends TestCase
         $this->get('/')->assertOk()->assertSee('Beta')->assertDontSee('Gamma');
     }
 
+    public function test_the_defaults_of_the_code_stand_when_the_config_has_none(): void
+    {
+        config(['atrium-theme' => []]);
+
+        foreach (range(1, 21) as $number) {
+            $this->makePost('Post '.$number);
+        }
+
+        $home = (string) $this->get('/')->assertOk()->getContent();
+        $this->assertSame(3, substr_count($home, '<li class="card">'));
+
+        $list = (string) $this->get('/posts')->assertOk()->assertSee('Page 1 of 2')->getContent();
+        $this->assertSame(20, substr_count($list, '<li class="card">'));
+    }
+
     public function test_a_list_of_a_page_other_than_the_first_has_no_language_versions(): void
     {
         $this->language();
