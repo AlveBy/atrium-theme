@@ -231,7 +231,7 @@ final class ControllerInternalsTest extends TestCase
         $queries = array_column(DB::getQueryLog(), 'query');
         DB::disableQueryLog();
 
-        return array_values(array_filter($queries, fn (string $sql): bool => str_contains($sql, 'product_sections') && str_ends_with($sql, 'limit 1')));
+        return array_values(array_filter($queries, fn (string $sql): bool => str_contains($sql, '"product_sections" where')));
     }
 
     public function test_a_record_that_stands_in_no_section_asks_the_tree_nothing(): void

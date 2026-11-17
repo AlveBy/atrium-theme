@@ -11,7 +11,6 @@ namespace Atrium\Theme;
 
 use Atrium\Admin\Cache\Card;
 use Atrium\Admin\Cache\RecordCache;
-use Atrium\Admin\Contracts\Administrable;
 use Atrium\Admin\Contracts\Cacheable;
 use Atrium\Admin\Fields\BelongsToField;
 use Atrium\Admin\Support\ContentLanguages;
@@ -330,13 +329,14 @@ final class Pages
     {
         $first = $records->first();
 
-        if (! $first instanceof Administrable) {
+        // Read like RecordView reads them: a model needs only the fields.
+        if ($first === null || ! method_exists($class = $first::class, 'getAdministrationFields')) {
             return;
         }
 
         $relations = [];
 
-        foreach ((array) $first::getAdministrationFields() as $field) {
+        foreach ((array) $class::getAdministrationFields() as $field) {
             if (! $field instanceof BelongsToField || ($class = $field->getModelClass()) === null) {
                 continue;
             }
