@@ -9,8 +9,12 @@ declare(strict_types=1);
 
 namespace Atrium\Theme\Tests;
 
+use Atrium\Theme\Pages;
+use Atrium\Theme\Tests\Fixtures\Post;
+use Atrium\Theme\Tests\Fixtures\ProductSection;
 use Atrium\Theme\Tests\Fixtures\Story;
 use Illuminate\Support\Facades\View;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * A module may draw its pages with a view of its own (themeView).
@@ -39,5 +43,38 @@ final class ModuleViewTest extends TestCase
 
         // A view that does not exist leaves the theme's own.
         $this->get('/stories')->assertOk()->assertSee('<h1>Stories</h1>', false);
+    }
+
+    public function test_a_section_without_a_module_view_keeps_the_themes_own(): void
+    {
+        View::addNamespace('theme-test', __DIR__.'/Fixtures/views');
+        // Product sections have no themeView: the theme draws them.
+        ProductSection::query()->create(['name' => 'Computers', 'code' => 'computers']);
+        $this->get('/catalog/computers')->assertOk()->assertSee('<h1>Computers</h1>', false)->assertDontSee('class="shelf"', false);
+    }
+
+    /**
+     * @return array<string,array{class-string,string,string}>
+     */
+    public static function views(): array
+    {
+        return [
+            'the module names an existing view' => [Story::class, 'page', 'theme-test::story'],
+            'the module names a view that does not exist' => [Story::class, 'index', 'default'],
+            'the module has no view for this page' => [Story::class, 'section', 'default'],
+            'the module has no themeView at all' => [Post::class, 'page', 'default'],
+            'a class that is not a module' => [\stdClass::class, 'page', 'default'],
+        ];
+    }
+
+    /**
+     * @param  class-string  $class
+     */
+    #[DataProvider('views')]
+    public function test_the_view_of_a_page_is_the_modules_when_it_has_one_and_exists(string $class, string $page, string $expected): void
+    {
+        View::addNamespace('theme-test', __DIR__.'/Fixtures/views');
+
+        $this->assertSame($expected, (new Pages)->view($class, $page, 'default'));
     }
 }
