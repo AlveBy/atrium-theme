@@ -69,6 +69,8 @@ final class RecordViewFromCardTest extends TestCase
             'manual' => '/upload/files/manual.pdf', 'active_from' => '2026-03-04 10:00:00',
         ]);
         $product->related()->attach($mouse->id);
+        // A decimal column reads back as "10" on SQLite and "10.00" on MySQL and PostgreSQL.
+        $price = (string) Product::query()->whereKey($product->id)->value('price');
 
         $this->assertSame([
             'title' => 'Gaming laptop',
@@ -87,7 +89,7 @@ final class RecordViewFromCardTest extends TestCase
             'blocks' => [
                 ['kind' => 'properties', 'items' => [
                     ['label' => 'Article', 'value' => 'A-1', 'url' => null, 'links' => []],
-                    ['label' => 'Price', 'value' => '10', 'url' => null, 'links' => []],
+                    ['label' => 'Price', 'value' => $price, 'url' => null, 'links' => []],
                     ['label' => 'Color', 'value' => 'Silver', 'url' => null, 'links' => []],
                     ['label' => 'Brand', 'value' => 'Northwind', 'url' => null, 'links' => []],
                     ['label' => 'Related', 'value' => 'Mouse', 'url' => null, 'links' => [['value' => 'Mouse', 'url' => '/catalog/laptops/mouse']]],

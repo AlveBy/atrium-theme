@@ -156,6 +156,18 @@ final class ControllerInternalsTest extends TestCase
         $this->assertNotInstanceOf(RedirectResponse::class, $response);
     }
 
+    public function test_of_records_sharing_a_code_the_one_at_the_path_opens_and_the_first_stands_in_for_a_wrong_path(): void
+    {
+        // Crates are not cached: the records are read by the query itself.
+        $wood = Crate::query()->create(['name' => 'Wood', 'code' => 'wood']);
+        $metal = Crate::query()->create(['name' => 'Metal', 'code' => 'metal']);
+        Crate::query()->create(['name' => 'Wooden box', 'code' => 'box', 'parent_id' => $wood->id]);
+        Crate::query()->create(['name' => 'Metal box', 'code' => 'box', 'parent_id' => $metal->id]);
+
+        $this->get('/catalog/metal/box')->assertOk()->assertSee('Metal box')->assertDontSee('Wooden box');
+        $this->get('/catalog/stone/box')->assertRedirect($this->root().'/catalog/wood/box');
+    }
+
     public function test_a_section_shows_the_records_of_the_first_model_that_stands_in_its_tree(): void
     {
         $computers = ProductSection::query()->create(['name' => 'Computers', 'code' => 'computers']);
@@ -231,7 +243,7 @@ final class ControllerInternalsTest extends TestCase
         $queries = array_column(DB::getQueryLog(), 'query');
         DB::disableQueryLog();
 
-        return array_values(array_filter($queries, fn (string $sql): bool => str_contains($sql, '"product_sections" where')));
+        return array_values(array_filter($queries, fn (string $sql): bool => (bool) preg_match('/["`]product_sections["`] where/', $sql)));
     }
 
     public function test_a_record_that_stands_in_no_section_asks_the_tree_nothing(): void

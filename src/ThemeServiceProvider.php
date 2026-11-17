@@ -133,7 +133,7 @@ final class ThemeServiceProvider extends ServiceProvider
 
             if ($record instanceof Model && ! $record instanceof Sitemapable && PublicUrl::ruleFor($record::class) !== null) {
                 $this->app->make(Sitemap::class)->flush();
-                PublicUrl::forgetPaths();
+                PublicUrl::forgetMemo();
             }
         };
 
