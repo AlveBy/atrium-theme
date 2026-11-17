@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Atrium\Theme;
 
+use Atrium\Admin\Cache\Card;
 use Atrium\Admin\Fields\BelongsToField;
 use Atrium\Admin\Fields\BelongsToManyField;
 use Atrium\Admin\Fields\Field;
@@ -28,6 +29,10 @@ use Throwable;
  * form: the picture, the text, then every other filled-in field by its type
  * — images as a gallery, files as links, the rest as a list of properties.
  * No template per module: whatever the form has, the page has.
+ *
+ * For a model in the record cache all of it is worked out once, when its
+ * card is built (toArray(), stored as the card's "theme" part), and the
+ * page reads it back with no query: fromCard().
  */
 final class RecordView
 {
@@ -49,13 +54,111 @@ final class RecordView
     /** @var array<int|string,Field>|null */
     private ?array $fields = null;
 
+    /**
+     * @param  array<string,mixed>|null  $data  what toArray() gave when the card was built
+     */
     public function __construct(
         public readonly Model $record,
         private readonly Pages $pages,
+        private readonly ?array $data = null,
     ) {}
+
+    /**
+     * The page of a cached record: the card's model and the card's "theme"
+     * part. A card built before the theme was installed has none, and the
+     * page is worked out from the model then.
+     */
+    public static function fromCard(Card $card, Pages $pages): self
+    {
+        $data = $card->extra('theme');
+
+        return new self($card->model(), $pages, is_array($data) ? $data : null);
+    }
+
+    /**
+     * Everything the page shows, as plain values for the cache. Addresses
+     * on the current host are kept without it: the same card serves every
+     * domain of the site.
+     *
+     * @return array<string,mixed>
+     */
+    public function toArray(): array
+    {
+        $local = static fn (?string $url): ?string => self::local($url);
+
+        return [
+            'title' => $this->title(),
+            'seo_title' => $this->seoTitle(),
+            'seo_description' => $this->seoDescription(),
+            'seo_keywords' => $this->seoKeywords(),
+            'og_image' => $local($this->ogImage()),
+            'url' => $local($this->url()),
+            'path' => $this->pages->path($this->record),
+            'urls' => array_map($local, $this->pages->urls($this->record)),
+            'date' => $this->date()?->toIso8601String(),
+            'image' => $local($this->image()),
+            'thumbnail' => $local($this->thumbnail()),
+            'teaser' => $this->teaser()?->toHtml(),
+            'body' => $this->body()?->toHtml(),
+            'blocks' => array_map(static function (array $block) use ($local): array {
+                if (isset($block['html'])) {
+                    $block['html'] = $block['html']->toHtml();
+                }
+
+                if (isset($block['images'])) {
+                    $block['images'] = array_map($local, $block['images']);
+                }
+
+                if (isset($block['files'])) {
+                    $block['files'] = array_map(static fn (array $file): array => ['name' => $file['name'], 'url' => $local($file['url'])], $block['files']);
+                }
+
+                if (isset($block['items'])) {
+                    $block['items'] = array_map(static function (array $item) use ($local): array {
+                        $item['url'] = $local($item['url'] ?? null);
+                        $item['links'] = array_map(static fn (array $link): array => ['value' => $link['value'], 'url' => $local($link['url'] ?? null)], $item['links']);
+
+                        return $item;
+                    }, $block['items']);
+                }
+
+                return $block;
+            }, $this->blocks()),
+        ];
+    }
+
+    /**
+     * The path below the module's prefix (section path and code).
+     */
+    public function path(): ?string
+    {
+        if ($this->data !== null) {
+            return $this->data['path'] ?? null;
+        }
+
+        return $this->pages->path($this->record);
+    }
+
+    /**
+     * The page in every language it is written in.
+     *
+     * @return array<string,string>
+     */
+    public function urls(): array
+    {
+        if ($this->data !== null) {
+            return array_filter(array_map(self::absolute(...), (array) ($this->data['urls'] ?? [])));
+        }
+
+        return $this->pages->urls($this->record);
+    }
 
     public function title(): string
     {
+        if ($this->data !== null) {
+            return (string) $this->data['title'];
+        }
+
         foreach (['name', 'title'] as $attribute) {
             if (($text = $this->pages->text($this->record, $attribute)) !== '') {
                 return $text;
@@ -73,6 +176,10 @@ final class RecordView
      */
     public function seoTitle(): string
     {
+        if ($this->data !== null) {
+            return (string) $this->data['seo_title'];
+        }
+
         $title = method_exists($this->record, 'getSeoTitle') ? (string) $this->record->getSeoTitle() : '';
 
         return $title !== '' ? $title : $this->title();
@@ -80,6 +187,10 @@ final class RecordView
 
     public function seoDescription(): string
     {
+        if ($this->data !== null) {
+            return (string) $this->data['seo_description'];
+        }
+
         $description = method_exists($this->record, 'getSeoDescription') ? (string) $this->record->getSeoDescription() : '';
 
         if ($description !== '') {
@@ -93,11 +204,19 @@ final class RecordView
 
     public function seoKeywords(): ?string
     {
+        if ($this->data !== null) {
+            return $this->data['seo_keywords'] ?? null;
+        }
+
         return method_exists($this->record, 'getSeoKeywords') ? $this->record->getSeoKeywords() : null;
     }
 
     public function ogImage(): ?string
     {
+        if ($this->data !== null) {
+            return self::absolute($this->data['og_image'] ?? null);
+        }
+
         $image = method_exists($this->record, 'getOgImage') ? $this->record->getOgImage() : null;
 
         return is_string($image) && $image !== '' ? $image : $this->image();
@@ -105,11 +224,19 @@ final class RecordView
 
     public function url(): ?string
     {
+        if ($this->data !== null) {
+            return self::absolute($this->data['url'] ?? null);
+        }
+
         return $this->pages->url($this->record);
     }
 
     public function date(): ?Carbon
     {
+        if ($this->data !== null) {
+            return isset($this->data['date']) ? Carbon::parse($this->data['date'])->locale(app()->getLocale()) : null;
+        }
+
         $value = $this->record->getAttribute('active_from');
 
         return $value instanceof DateTimeInterface ? Carbon::instance($value)->locale(app()->getLocale()) : null;
@@ -120,6 +247,10 @@ final class RecordView
      */
     public function image(): ?string
     {
+        if ($this->data !== null) {
+            return self::absolute($this->data['image'] ?? null);
+        }
+
         return $this->media('detail_picture') ?? $this->media('picture') ?? $this->media('preview_picture');
     }
 
@@ -128,6 +259,10 @@ final class RecordView
      */
     public function thumbnail(): ?string
     {
+        if ($this->data !== null) {
+            return self::absolute($this->data['thumbnail'] ?? null);
+        }
+
         return $this->media('preview_picture') ?? $this->media('picture') ?? $this->media('detail_picture');
     }
 
@@ -136,6 +271,10 @@ final class RecordView
      */
     public function teaser(): ?HtmlString
     {
+        if ($this->data !== null) {
+            return isset($this->data['teaser']) ? new HtmlString((string) $this->data['teaser']) : null;
+        }
+
         return $this->html('preview_text');
     }
 
@@ -145,6 +284,10 @@ final class RecordView
      */
     public function body(): ?HtmlString
     {
+        if ($this->data !== null) {
+            return isset($this->data['body']) ? new HtmlString((string) $this->data['body']) : null;
+        }
+
         return $this->html('detail_text') ?? $this->html('preview_text') ?? $this->html('description');
     }
 
@@ -152,10 +295,14 @@ final class RecordView
      * Everything else that is filled in, in the form's order. Neighbouring
      * properties are grouped into one list.
      *
-     * @return array<int,array{kind:'properties',items:array<int,array{label:string,value:string,url:?string}>}|array{kind:'html',label:string,html:HtmlString}|array{kind:'images',label:string,images:array<int,string>}|array{kind:'files',label:string,files:array<int,array{name:string,url:string}>}>
+     * @return array<int,array{kind:'properties',items:array<int,array{label:string,value:string,url:?string,links:array<int,array{value:string,url:?string}>}>}|array{kind:'html',label:string,html:HtmlString}|array{kind:'images',label:string,images:array<int,string>}|array{kind:'files',label:string,files:array<int,array{name:string,url:string}>}>
      */
     public function blocks(): array
     {
+        if ($this->data !== null) {
+            return $this->cachedBlocks();
+        }
+
         $blocks = [];
         $skip = $this->skippedColumns();
 
@@ -273,8 +420,17 @@ final class RecordView
             return null;
         }
 
+        // The relation behind the field, when it is loaded (cards load it
+        // for every record at once); a query otherwise.
+        $relation = Str::camel(Str::beforeLast($field->getColumn(), '_id'));
+        $loaded = $field->getValueColumn() === 'id' && $relation !== $field->getColumn() && $this->record->relationLoaded($relation)
+            ? $this->record->getRelation($relation)
+            : false;
+
         /** @var class-string<Model> $class */
-        $related = $class::query()->where($field->getValueColumn(), $value)->first();
+        $related = $loaded instanceof Model || $loaded === null
+            ? $loaded
+            : $this->pages->linked($class, $field->getValueColumn(), $value);
 
         if ($related === null) {
             return null;
@@ -303,7 +459,9 @@ final class RecordView
 
         $items = [];
 
-        foreach ($relation->get() as $item) {
+        $related = $this->record->relationLoaded($name) ? $this->record->getRelation($name) : $relation->get();
+
+        foreach ($related as $item) {
             $text = $this->pages->text($item, $field->getDisplayColumn());
 
             if ($text !== '') {
@@ -421,5 +579,59 @@ final class RecordView
         $fields = method_exists($class, 'getAdministrationFields') ? $class::getAdministrationFields() : [];
 
         return $this->fields ??= array_filter($fields, static fn (mixed $field): bool => $field instanceof Field);
+    }
+
+    /**
+     * Blocks read back from the cache: texts become HTML again, addresses
+     * get the current host.
+     *
+     * @return array<int,array<string,mixed>>
+     */
+    private function cachedBlocks(): array
+    {
+        return array_map(static function (array $block): array {
+            if (isset($block['html'])) {
+                $block['html'] = new HtmlString((string) $block['html']);
+            }
+
+            if (isset($block['images'])) {
+                $block['images'] = array_map(self::absolute(...), $block['images']);
+            }
+
+            if (isset($block['files'])) {
+                $block['files'] = array_map(static fn (array $file): array => ['name' => $file['name'], 'url' => self::absolute($file['url'])], $block['files']);
+            }
+
+            if (isset($block['items'])) {
+                $block['items'] = array_map(static function (array $item): array {
+                    $item['url'] = self::absolute($item['url'] ?? null);
+                    $item['links'] = array_map(static fn (array $link): array => ['value' => $link['value'], 'url' => self::absolute($link['url'] ?? null)], $item['links'] ?? []);
+
+                    return $item;
+                }, $block['items']);
+            }
+
+            return $block;
+        }, (array) ($this->data['blocks'] ?? []));
+    }
+
+    private static function local(?string $url): ?string
+    {
+        if ($url === null) {
+            return null;
+        }
+
+        $host = request()->getSchemeAndHttpHost();
+
+        return str_starts_with($url, $host.'/') || $url === $host ? substr($url, strlen($host)) ?: '/' : $url;
+    }
+
+    private static function absolute(?string $url): ?string
+    {
+        if ($url === null || $url === '') {
+            return null;
+        }
+
+        return str_starts_with($url, '/') && ! str_starts_with($url, '//') ? request()->getSchemeAndHttpHost().$url : $url;
     }
 }

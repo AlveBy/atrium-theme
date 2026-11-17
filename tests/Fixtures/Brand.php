@@ -9,12 +9,16 @@ declare(strict_types=1);
 
 namespace Atrium\Theme\Tests\Fixtures;
 
+use Atrium\Admin\Cache\CachesRecords;
+use Atrium\Admin\Contracts\Cacheable;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * A highload directory: no page of its own.
  */
-class Brand extends Model
+class Brand extends Model implements Cacheable
 {
+    use CachesRecords;
+
     protected $guarded = [];
 }

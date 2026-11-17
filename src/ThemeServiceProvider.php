@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Atrium\Theme;
 
+use Atrium\Admin\Cache\RecordCache;
 use Atrium\Admin\Contracts\Sitemapable;
 use Atrium\Admin\Support\ContentLanguages;
 use Atrium\Admin\Support\PublicUrl;
@@ -19,6 +20,7 @@ use Atrium\Theme\Errors\ErrorViewFinder;
 use Atrium\Theme\Http\Controllers\PageController;
 use Atrium\Theme\Skins\Skin;
 use Atrium\Theme\Skins\Skins;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Routing\Route as RoutingRoute;
 use Illuminate\Support\Facades\Event;
@@ -86,6 +88,44 @@ final class ThemeServiceProvider extends ServiceProvider
                 fn (): iterable => $this->sitemapRecords(),
                 fn (Model $record, string $language): ?string => $this->sitemapUrl($record, $language),
             );
+        });
+
+        // A cached record's card carries its page, worked out once.
+        $this->callAfterResolving(RecordCache::class, function (RecordCache $cache): void {
+            // atrium:cache:warm opens the home page and the first page of every list.
+            $cache->warmUsing(function (string $language): array {
+                $pages = $this->app->make(Pages::class);
+                $urls = [$pages->homeUrl($language)];
+
+                foreach ($pages->prefixes() as $prefix) {
+                    $urls[] = $pages->indexUrl($prefix, $language);
+                }
+
+                return $urls;
+            });
+
+            $cache->extend('theme', function (Collection $models): array {
+                $pages = $this->app->make(Pages::class);
+                $first = $models->first();
+
+                // Only the modules whose pages the theme draws.
+                if ($first === null || ($rule = PublicUrl::ruleFor($first::class)) === null || $rule['prefix'] === '' || ! Route::has('atrium.theme.page')) {
+                    return [];
+                }
+
+                $data = [];
+                $pages->preloadLinks($models);
+
+                try {
+                    foreach ($models as $record) {
+                        $data[$record->getKey()] = (new RecordView($record, $pages))->toArray();
+                    }
+                } finally {
+                    $pages->forgetLinks();
+                }
+
+                return $data;
+            });
         });
 
         $flush = function (string $event, array $payload): void {

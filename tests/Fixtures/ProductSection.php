@@ -9,12 +9,16 @@ declare(strict_types=1);
 
 namespace Atrium\Theme\Tests\Fixtures;
 
+use Atrium\Admin\Cache\CachesRecords;
+use Atrium\Admin\Contracts\Cacheable;
 use Atrium\Admin\Fields\ContentField;
 use Atrium\Admin\Fields\TextField;
 use Illuminate\Database\Eloquent\Model;
 
-class ProductSection extends Model
+class ProductSection extends Model implements Cacheable
 {
+    use CachesRecords;
+
     protected $guarded = [];
 
     protected function casts(): array

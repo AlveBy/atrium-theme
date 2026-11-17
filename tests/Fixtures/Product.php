@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Atrium\Theme\Tests\Fixtures;
 
+use Atrium\Admin\Cache\CachesRecords;
+use Atrium\Admin\Contracts\Cacheable;
 use Atrium\Admin\Fields\BelongsToField;
 use Atrium\Admin\Fields\BelongsToManyField;
 use Atrium\Admin\Fields\CheckboxField;
@@ -29,9 +31,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 /**
  * Shaped like a model the Bitrix migrator generates.
  */
-class Product extends Model
+class Product extends Model implements Cacheable
 {
-    use HasAdminSeo;
+    use CachesRecords, HasAdminSeo;
 
     protected $guarded = [];
 

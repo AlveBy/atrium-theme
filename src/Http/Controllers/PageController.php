@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Atrium\Theme\Http\Controllers;
 
+use Atrium\Admin\Cache\Card;
 use Atrium\Admin\Facades\Setting;
 use Atrium\Admin\Modules\Modules;
 use Atrium\Admin\Support\ContentLanguages;
@@ -61,7 +62,7 @@ final class PageController extends Controller
             $modules[] = [
                 'label' => $this->pages->label($class),
                 'url' => $this->pages->indexUrl($prefix),
-                'records' => $this->views($this->pages->visible($class)->limit((int) config('atrium-theme.home_items', 3))->get()),
+                'records' => $this->withUrls($this->pages->records($this->pages->visible($class)->limit((int) config('atrium-theme.home_items', 3)))),
             ];
         }
 
@@ -79,7 +80,7 @@ final class PageController extends Controller
 
         foreach ($this->pages->sectionModels($prefix) as $class) {
             $rule = $this->pages->module($prefix)[$class];
-            $sections = [...$sections, ...$this->views($this->pages->visible($class)->whereNull($rule['parent_column'])->get())];
+            $sections = [...$sections, ...$this->withUrls($this->pages->records($this->pages->visible($class)->whereNull($rule['parent_column'])))];
         }
 
         $class = $this->pages->elementModels($prefix)[0] ?? null;
@@ -104,20 +105,21 @@ final class PageController extends Controller
 
         abort_if($record === null, 404);
 
-        $url = $this->pages->url($record);
+        // From its card when the module is cached: no query.
+        $view = $this->pages->page($record);
+        $url = $view->url();
 
         abort_if($url === null, 404);
 
         // Found by its code under another path: send the visitor and search
         // engines to where it lives now.
-        if ($this->pages->path($record) !== trim($path, '/')) {
+        if ($view->path() !== trim($path, '/')) {
             return redirect()->to($url, 301);
         }
 
         $rule = $this->pages->module($prefix)[$record::class];
-        $urls = $this->pages->urls($record);
+        $urls = $view->urls();
         $switch = $this->everyLanguage(fn (string $code): string => $urls[$code] ?? $this->pages->homeUrl($code));
-        $view = new RecordView($record, $this->pages);
         $breadcrumbs = $this->breadcrumbs($prefix, $record, $rule);
 
         if ($this->pages->isSectionModel($record::class, $rule)) {
@@ -141,7 +143,7 @@ final class PageController extends Controller
     private function section(Request $request, string $prefix, Model $section, RecordView $view, string $url, array $breadcrumbs, array $urls, array $switch): View
     {
         $rule = $this->pages->module($prefix)[$section::class];
-        $children = $this->views($this->pages->visible($section::class)->where($rule['parent_column'], $section->getKey())->get());
+        $children = $this->withUrls($this->pages->records($this->pages->visible($section::class)->where($rule['parent_column'], $section->getKey())));
 
         $records = null;
 
@@ -185,17 +187,17 @@ final class PageController extends Controller
             $parentColumn = PublicUrl::ruleFor($tree)['parent_column'];
 
             for ($depth = 0; $parentId && $depth < self::MAX_DEPTH; $depth++) {
-                $section = $tree::query()->find($parentId);
+                $section = $this->pages->record($tree, $parentId);
 
-                if (! $section instanceof Model) {
+                if ($section === null) {
                     break;
                 }
 
-                if (($url = $this->pages->url($section)) !== null) {
-                    array_unshift($crumbs, ['label' => (new RecordView($section, $this->pages))->title(), 'url' => $url]);
+                if (($url = $section->url()) !== null) {
+                    array_unshift($crumbs, ['label' => $section->title(), 'url' => $url]);
                 }
 
-                $parentId = $section->getAttribute($parentColumn);
+                $parentId = $section->record->getAttribute($parentColumn);
             }
         }
 
@@ -205,27 +207,20 @@ final class PageController extends Controller
     }
 
     /**
-     * @param  iterable<Model>  $records
+     * The pages a visitor can open.
+     *
+     * @param  array<int,RecordView>  $views
      * @return array<int,RecordView>
      */
-    private function views(iterable $records): array
+    private function withUrls(array $views): array
     {
-        $views = [];
-
-        foreach ($records as $record) {
-            $view = new RecordView($record, $this->pages);
-
-            if ($view->url() !== null) {
-                $views[] = $view;
-            }
-        }
-
-        return $views;
+        return array_values(array_filter($views, static fn (RecordView $view): bool => $view->url() !== null));
     }
 
     /**
      * As many records a page as the module's `per_page` setting says, if it
-     * has one, or `atrium-theme.per_page`.
+     * has one, or `atrium-theme.per_page`. For a cached module the ids come
+     * from the cache, then the cards; the query itself otherwise.
      *
      * @param  Builder<Model>  $query
      */
@@ -233,6 +228,13 @@ final class PageController extends Controller
     {
         $module = app(Modules::class)->ownerOf($query->getModel()::class);
         $perPage = (int) ($module === null ? null : Setting::get($module->key().'.per_page')) ?: (int) config('atrium-theme.per_page', 20);
+
+        if ($this->pages->isCached($query->getModel()::class)) {
+            $page = $query->cachedPaginate($perPage)->withQueryString();
+            $page->setCollection($page->getCollection()->map(fn (Card $card): RecordView => RecordView::fromCard($card, $this->pages)));
+
+            return $page;
+        }
 
         $page = $query->paginate($perPage)->withQueryString();
         $page->setCollection($page->getCollection()->map(fn (Model $record): RecordView => new RecordView($record, $this->pages)));

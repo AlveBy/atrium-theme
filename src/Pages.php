@@ -9,14 +9,22 @@ declare(strict_types=1);
 
 namespace Atrium\Theme;
 
+use Atrium\Admin\Cache\Card;
+use Atrium\Admin\Cache\RecordCache;
+use Atrium\Admin\Contracts\Administrable;
+use Atrium\Admin\Contracts\Cacheable;
+use Atrium\Admin\Fields\BelongsToField;
 use Atrium\Admin\Support\ContentLanguages;
 use Atrium\Admin\Support\PublicUrl;
 use Atrium\Theme\Skins\Skins;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use WeakMap;
 
 /**
  * The modules that have pages on the site, read from
@@ -32,8 +40,14 @@ final class Pages
     /** How many records one code may match before the lenient lookup gives up. */
     private const MAX_CANDIDATES = 50;
 
+    /** @var array<string,Model|null> linked records, for preloadLinks() */
+    private array $links = [];
+
     /** @var array<string,array<string,true>> */
     private array $columns = [];
+
+    /** @var WeakMap<Model,Card>|null the card each model from the cache came from */
+    private ?WeakMap $cards = null;
 
     /**
      * Prefix => [model class => rule], the longest prefix first, so that
@@ -150,17 +164,19 @@ final class Pages
     {
         $query = $class::query();
         $has = $this->columns($query->getModel());
+        // Time in steps, not to the second: the cached lists keep their keys.
+        $now = app(RecordCache::class)->now();
 
         if (isset($has['active'])) {
             $query->where('active', true);
         }
 
         if (isset($has['active_from'])) {
-            $query->where(fn (Builder $q) => $q->whereNull('active_from')->orWhere('active_from', '<=', now()));
+            $query->where(fn (Builder $q) => $q->whereNull('active_from')->orWhere('active_from', '<=', $now));
         }
 
         if (isset($has['active_to'])) {
-            $query->where(fn (Builder $q) => $q->whereNull('active_to')->orWhere('active_to', '>=', now()));
+            $query->where(fn (Builder $q) => $q->whereNull('active_to')->orWhere('active_to', '>=', $now));
         }
 
         if (isset($has['sort'])) {
@@ -192,8 +208,23 @@ final class Pages
             $query = $this->visible($class);
             $model = $query->getModel();
             $column = $this->isTranslatable($model, 'code') ? 'code->'.app()->getLocale() : 'code';
+            $query->where($column, $code)->limit(self::MAX_CANDIDATES);
 
-            foreach ($query->where($column, $code)->limit(self::MAX_CANDIDATES)->get() as $record) {
+            if ($this->isCached($class)) {
+                foreach ($query->cachedCards() as $card) {
+                    $record = $this->remember($card);
+
+                    if ($this->page($record)->path() === $path) {
+                        return $record;
+                    }
+
+                    $fallback ??= $record;
+                }
+
+                continue;
+            }
+
+            foreach ($query->get() as $record) {
                 if ($this->path($record) === $path) {
                     return $record;
                 }
@@ -203,6 +234,70 @@ final class Pages
         }
 
         return $fallback;
+    }
+
+    /**
+     * Whether a module's records come from the record cache.
+     */
+    public function isCached(string $class): bool
+    {
+        return is_subclass_of($class, Cacheable::class) && app(RecordCache::class)->enabled();
+    }
+
+    /**
+     * Records of a query as pages: from their cards when the model is
+     * cached (one cache read, no query on a warm cache), from the
+     * database otherwise.
+     *
+     * @param  Builder<Model>  $query
+     * @return array<int,RecordView>
+     */
+    public function records(Builder $query): array
+    {
+        $class = $query->getModel()::class;
+
+        if (! $this->isCached($class)) {
+            return array_map(fn (Model $record): RecordView => new RecordView($record, $this), $query->get()->all());
+        }
+
+        return array_map(fn (Card $card): RecordView => RecordView::fromCard($card, $this), $query->cachedCards());
+    }
+
+    /**
+     * One record as a page, by id.
+     *
+     * @param  class-string<Model>  $class
+     */
+    public function record(string $class, int|string $id): ?RecordView
+    {
+        if ($this->isCached($class)) {
+            $card = app(RecordCache::class)->cards($class, [$id])[0] ?? null;
+
+            return $card === null ? null : RecordView::fromCard($card, $this);
+        }
+
+        $record = $class::query()->find($id);
+
+        return $record instanceof Model ? new RecordView($record, $this) : null;
+    }
+
+    /**
+     * The page of a record: from its card when it came from the cache.
+     */
+    public function page(Model $record): RecordView
+    {
+        $card = $this->cards?->offsetExists($record) ? $this->cards[$record] : null;
+
+        return $card instanceof Card ? RecordView::fromCard($card, $this) : new RecordView($record, $this);
+    }
+
+    private function remember(Card $card): Model
+    {
+        $this->cards ??= new WeakMap;
+        $model = $card->model();
+        $this->cards[$model] = $card;
+
+        return $model;
     }
 
     /**
@@ -222,6 +317,90 @@ final class Pages
             : (PublicUrl::sectionPaths($rule['tree'], $rule['parent_column'])[$record->getAttribute($rule['parent'])] ?? '');
 
         return ltrim($parent.'/'.$code, '/');
+    }
+
+    /**
+     * Load the records a batch links to through its form's belongs-to
+     * fields and belongs-to-many relations, a query per field instead of
+     * one per record.
+     *
+     * @param  EloquentCollection<int,Model>  $records
+     */
+    public function preloadLinks(EloquentCollection $records): void
+    {
+        $first = $records->first();
+
+        if (! $first instanceof Administrable) {
+            return;
+        }
+
+        $relations = [];
+
+        foreach ((array) $first::getAdministrationFields() as $field) {
+            if (! $field instanceof BelongsToField || ($class = $field->getModelClass()) === null) {
+                continue;
+            }
+
+            if ($field->getType() === 'belongsToMany') {
+                if (method_exists($first, $field->getName()) && $first->{$field->getName()}() instanceof BelongsToMany) {
+                    $relations[] = $field->getName();
+                }
+
+                continue;
+            }
+
+            $values = $records->map(fn (Model $record): mixed => $record->getAttribute($field->getColumn()))
+                ->filter(fn (mixed $value): bool => is_scalar($value) && $value !== '')
+                ->unique()
+                ->reject(fn (mixed $value): bool => array_key_exists($this->linkKey($class, $field->getValueColumn(), $value), $this->links))
+                ->values()
+                ->all();
+
+            if ($values === []) {
+                continue;
+            }
+
+            foreach ($values as $value) {
+                $this->links[$this->linkKey($class, $field->getValueColumn(), $value)] = null;
+            }
+
+            /** @var class-string<Model> $modelClass */
+            $modelClass = $class;
+
+            foreach ($modelClass::query()->whereIn($field->getValueColumn(), $values)->get() as $related) {
+                $this->links[$this->linkKey($class, $field->getValueColumn(), $related->getAttribute($field->getValueColumn()))] = $related;
+            }
+        }
+
+        if ($relations !== []) {
+            $records->loadMissing($relations);
+        }
+    }
+
+    /**
+     * The record a belongs-to field points at: from preloadLinks() while
+     * its batch is being drawn, a query otherwise.
+     *
+     * @param  class-string<Model>  $class
+     */
+    public function linked(string $class, string $column, mixed $value): ?Model
+    {
+        $key = $this->linkKey($class, $column, $value);
+
+        return array_key_exists($key, $this->links) ? $this->links[$key] : $class::query()->where($column, $value)->first();
+    }
+
+    /**
+     * Drop what preloadLinks() loaded: it holds for one batch only.
+     */
+    public function forgetLinks(): void
+    {
+        $this->links = [];
+    }
+
+    private function linkKey(string $class, string $column, mixed $value): string
+    {
+        return $class.'|'.$column.'|'.(string) $value;
     }
 
     /**
