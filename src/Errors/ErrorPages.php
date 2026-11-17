@@ -64,7 +64,7 @@ final class ErrorPages
             $prefix = (string) $this->request()->segment(1);
             app()->setLocale($prefix !== $languages->default() && $languages->has($prefix) ? $prefix : $languages->default());
 
-            $data['siteName'] = (string) ($sites->current()->name ?: $data['siteName']);
+            $data['siteName'] = $sites->current()->name ?: $data['siteName'];
             $data['homeUrl'] = app(Pages::class)->homeUrl();
             $data['searchUrl'] = Route::has('atrium.search') ? $languages->route('atrium.search') : null;
         } catch (Throwable) {

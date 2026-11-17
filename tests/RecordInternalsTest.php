@@ -272,11 +272,12 @@ final class RecordInternalsTest extends TestCase
 
     public function test_the_parent_column_of_the_rule_is_not_a_property(): void
     {
-        $fields = [TextField::make('category_id')->label('Category'), TextField::make('other_id')->label('Other')];
+        $fields = [TextField::make('category_id')->label('Category'), TextField::make('other_id')->label('Other'), TextField::make('sort')->label('Sort')];
+        $attributes = ['category_id' => 5, 'other_id' => 6, 'sort' => 7];
 
-        $this->assertSame(['Other'], array_column($this->blocks(['category_id' => 5, 'other_id' => 6], $fields)[0]['items'], 'label'));
+        $this->assertSame(['Other'], array_column($this->blocks($attributes, $fields)[0]['items'], 'label'));
 
-        $post = new RecordView(new SeoRelic(['category_id' => 5, 'other_id' => 6]), app(Pages::class));
+        $post = new RecordView(new SeoRelic($attributes), app(Pages::class));
         Relic::$fields = $fields;
 
         $this->assertSame(['Category', 'Other'], array_column($post->blocks()[0]['items'], 'label'));
@@ -374,9 +375,10 @@ final class RecordInternalsTest extends TestCase
 
     public function test_a_list_of_values_is_one_line_without_what_has_nothing_to_show(): void
     {
-        $items = $this->blocks(['tags' => ['a', true, '', 'b']], [TextField::make('tags')->label('Tags')])[0]['items'];
+        $items = $this->blocks(['tags' => ['a', true, '', 'b'], 'nested' => [['a', true], 'b']], [TextField::make('tags')->label('Tags'), TextField::make('nested')->label('Nested')])[0]['items'];
 
         $this->assertSame('a, b', $items[0]['value']);
+        $this->assertSame('a, b', $items[1]['value']);
     }
 
     public function test_a_flag_alone_is_nothing_to_read(): void

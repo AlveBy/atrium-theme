@@ -26,6 +26,7 @@ use Atrium\Theme\Tests\Fixtures\Spare;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\View as ViewFacade;
 use Illuminate\View\View;
 
 /**
@@ -48,6 +49,13 @@ final class ControllerInternalsTest extends TestCase
             Shelf::class => ['prefix' => 'shelves', 'tree' => Shelf::class, 'parent' => 'parent_id'],
             Post::class => ['prefix' => 'posts'],
         ]);
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        ViewFacade::addNamespace('theme-test', __DIR__.'/Fixtures/views');
     }
 
     private function makePost(string $name): Post
