@@ -78,5 +78,20 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        // Every kind of property a record page prints (RecordViewTest).
+        Schema::create('gadgets', function (Blueprint $table): void {
+            $table->id();
+            $table->string('name')->nullable();
+            $table->string('title')->nullable();
+            $table->text('notes')->nullable();
+            $table->string('released_on')->nullable();
+            $table->string('released_at')->nullable();
+            $table->text('sizes')->nullable();
+            $table->text('shots')->nullable();
+            $table->unsignedBigInteger('brand')->nullable();
+            $table->text('owner')->nullable();
+            $table->unsignedBigInteger('keeper')->nullable();
+            $table->timestamps();
+        });
     }
 };
