@@ -43,6 +43,9 @@ abstract class TestCase extends Orchestra
         // a translated code are JSON queries, different on each.
         $target = env('DB_CONNECTION');
         $config->set('database.default', in_array($target, ['mysql', 'pgsql'], true) ? $target : 'testing');
+        // Recording a page's timing prunes old rows on one request in a
+        // hundred: an extra query the query-counting tests must not see.
+        $config->set('atrium.dashboard.timings.enabled', false);
         $config->set('atrium.seo.title_suffix', ' | Demo shop');
         $config->set('atrium.public_urls', [
             Product::class => ['prefix' => 'catalog', 'tree' => ProductSection::class, 'parent' => 'section_id'],
