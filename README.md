@@ -43,6 +43,24 @@ Each module is a menu item, labelled with its admin label.
 - Translatable modules have a page in each language the record is written in. The language switcher leads to the same record in another language, or to that language's home page when there is no translation.
 - The theme's pages go into `sitemap.xml`. A record that is not translated has one address, in the default language.
 
+## Skins
+
+Four skins, each with its palette, its fonts and a home page built from the installed modules: a travel agency, a restaurant, a medical centre and a home goods shop.
+
+| `travel` | `restaurant` |
+|---|---|
+| ![The travel agency home page](docs/screenshots/travel.png) | ![The restaurant home page, dark](docs/screenshots/restaurant.png) |
+| **`clinic`** | **`shop`** |
+| ![The medical centre home page](docs/screenshots/clinic.png) | ![The home goods shop home page](docs/screenshots/shop.png) |
+
+Pick one in `.env`; without it the theme keeps the neutral look described above:
+
+```dotenv
+ATRIUM_THEME_SKIN=travel
+```
+
+Prices are printed in the site's currency (`ATRIUM_THEME_CURRENCY`, EUR by default) the way the page's language writes it, with the PHP `intl` extension. The skins' texts are in all 15 languages of Atrium. A section of the home page whose module is not installed is left out. The fonts are served from your site (`php artisan vendor:publish --tag=atrium-theme-assets`), never from Google Fonts; until they are published the skin uses the system fonts. Text keeps at least 4.5:1 in every skin, light and dark, and `tests/SkinsContrastTest.php` checks it. Another package can add a skin with `Skins::register()`. More, with each skin's sections and colours: [Skins](https://github.com/AlveBy/atrium/blob/main/docs/skins.md).
+
 ## Your own routes win
 
 The theme registers its routes after the app's. A route you define yourself is matched first, and the home page is left to you when the app has its own `GET /`.
@@ -60,6 +78,8 @@ Other settings (`php artisan vendor:publish --tag=atrium-theme-config`):
 | `routes` | `true` | register the pages |
 | `per_page` | `20` | records per page in a list |
 | `home_items` | `3` | records of each module on the home page |
+| `skin` | `null` | `travel`, `restaurant`, `clinic` or `shop` (`ATRIUM_THEME_SKIN`) |
+| `currency` | `EUR` | the ISO 4217 code of the skins' prices (`ATRIUM_THEME_CURRENCY`) |
 | `record_views` | `[]` | views drawn under every record page with `$record` and `$page`; module packages such as `alveby/atrium-reviews` add theirs |
 | `credit` | `true` | a small "Made with Atrium" link in the footer (`ATRIUM_THEME_CREDIT=false` hides it) |
 
@@ -140,7 +160,7 @@ From the repository root:
 vendor/bin/phpunit packages/theme/tests
 ```
 
-The tests set up a made-up catalog (sections, products with every field type, a translated blog) and check the pages, addresses, redirects, languages and the sitemap on SQLite, MySQL and PostgreSQL.
+The tests set up a made-up catalog (sections, products with every field type, a translated blog) and check the pages, addresses, redirects, languages and the sitemap on SQLite, MySQL and PostgreSQL. `tests/Skins` fills the real modules with content for each skin, all of them and only some, and checks the home pages.
 
 ## Contributing
 
