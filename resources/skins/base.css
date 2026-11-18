@@ -1,0 +1,153 @@
+/*
+ * This file is part of Atrium (https://github.com/AlveBy/atrium).
+ * Copyright (c) 2026 AlveBy. Licensed under the MIT License, see LICENSE.
+ */
+
+/*
+ * What every skin shares: the home page sections, the forms laid out in a
+ * row, the cards. A skin's own stylesheet comes after this one and sets the
+ * colours (custom properties, light and dark), the fonts and the shapes:
+ * --heading, --body, --radius, --radius-control, --brand, --on-brand,
+ * --field, --error.
+ *
+ * The skins' fonts have Latin and Cyrillic letters only. Chinese and
+ * Japanese take the system's fonts named in --cjk, which every font stack
+ * puts before its generic family; Japanese gets Japanese glyph shapes.
+ */
+:root { --cjk: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC"; }
+:root:lang(ja) { --cjk: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, "Noto Sans CJK JP", "Source Han Sans JP"; }
+
+/* Long German compounds break instead of running out of a card. */
+body { font-family: var(--body); font-size: 1.0625rem; overflow-wrap: break-word; hyphens: auto; }
+:lang(ja), :lang(zh) { line-break: strict; hyphens: manual; }
+/* Headings are wide enough on a desktop to keep their words whole. */
+@media (min-width: 768px) { h1, h2, h3 { hyphens: manual; } }
+h1, h2, h3 { font-family: var(--heading); }
+h2 { font-size: clamp(1.75rem, 1.3rem + 1.6vw, 2.25rem); margin-top: 0; }
+
+.wrap { max-width: 1200px; padding: 0 32px; }
+
+.site-header .wrap { min-height: 76px; gap: 12px 32px; padding-top: 12px; padding-bottom: 12px; }
+.site-name { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; }
+.site-name:hover { text-decoration: none; }
+.site-name:hover span { text-decoration: underline; }
+.menu ul { gap: 4px 24px; }
+.menu a { color: var(--text); font-weight: 600; text-decoration: none; }
+.menu a:hover, .menu a[aria-current="page"] { text-decoration: underline; text-decoration-thickness: 2px; }
+.sk-logo { flex: none; }
+.sk-phone { font-weight: 700; color: var(--text); text-decoration: none; white-space: nowrap; }
+.sk-phone:hover { text-decoration: underline; }
+/* A header with a phone or a button: they stay on the first row beside
+   the name, and the menu takes a row of its own below them. */
+.site-header .wrap:has(> .sk-phone, > .sk-contact, > .sk-btn) .menu { order: 1; flex-basis: 100%; }
+
+main.wrap { padding-top: 40px; padding-bottom: 64px; }
+.sk-home { display: block; }
+
+.sk-visually-hidden {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.sk-muted { color: var(--muted); }
+
+/* Buttons: a link or a button that leads somewhere, at least 44px high. */
+.sk-btn {
+    display: inline-flex; align-items: center; justify-content: center; min-height: 52px; padding: 0 28px;
+    border: 1px solid var(--brand); border-radius: var(--radius-control); background: var(--brand); color: var(--on-brand);
+    font-weight: 700; text-decoration: none; white-space: nowrap;
+}
+.sk-btn:hover { text-decoration: underline; }
+.sk-btn--small { min-height: 48px; padding: 0 22px; font-size: .95rem; }
+.sk-btn--ghost { background: transparent; color: var(--text); border-color: var(--text); font-weight: 600; }
+.sk-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+
+/* Bands: full-width sections of the home page. */
+.sk-band { padding: 72px 0; }
+.sk-band--tight { padding-top: 0; }
+.sk-band--soft { background: var(--soft, var(--surface)); }
+.sk-band--surface { background: var(--surface); }
+.sk-band--line { border-top: 1px solid var(--line); }
+.sk-band h2 { margin-bottom: 32px; }
+
+.sk-head { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 16px; margin-bottom: 32px; }
+.sk-head h2 { margin: 0; }
+.sk-head__all { margin-left: auto; font-weight: 700; }
+
+.sk-split { display: flex; flex-wrap: wrap; gap: 48px; }
+.sk-split > .sk-split__title { flex: 1 1 300px; margin: 0; }
+.sk-split > :not(.sk-split__title) { flex: 2 1 520px; min-width: 0; }
+
+/* The hero: text and an illustration side by side, one above the other on phones. */
+.sk-hero { display: flex; flex-wrap: wrap; gap: 48px; align-items: center; padding-top: 64px; padding-bottom: 72px; }
+.sk-hero__text { flex: 1 1 480px; min-width: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 22px; }
+.sk-hero__text > * { margin: 0; max-width: 100%; }
+.sk-hero h1 { font-size: clamp(2.25rem, 1.4rem + 3.2vw, 3.5rem); line-height: 1.05; letter-spacing: -0.02em; }
+.sk-hero__art { flex: 1 1 400px; min-width: 0; }
+.sk-hero__art svg { display: block; width: 100%; height: auto; }
+.sk-eyebrow { font-size: .875rem; font-weight: 700; }
+.sk-lead { font-size: 1.1875rem; line-height: 1.55; color: var(--muted); max-width: 32rem; }
+.sk-lead > * { margin: 0; }
+.sk-lead > * + * { margin-top: .75em; }
+.sk-hero__text > .sk-form, .sk-hero__text > div:has(.sk-form) { width: 100%; }
+
+/* Forms of the Forms module in a row that wraps; labels stay above the fields. */
+.sk-form.atrium-form { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; max-width: none; }
+.sk-form.atrium-form > p, .sk-form .atrium-form__field:has(textarea), .sk-form .atrium-form__field:has(fieldset), .sk-form .atrium-form__field:has(.atrium-form__choice) { flex-basis: 100%; }
+.sk-form .atrium-form__field { flex: 1 1 180px; display: flex; flex-direction: column; gap: 6px; font-size: .8125rem; font-weight: 600; color: var(--muted); min-width: 0; }
+.sk-form .atrium-form__field input:not([type=checkbox]):not([type=radio]), .sk-form .atrium-form__field select, .sk-form .atrium-form__field textarea {
+    width: 100%; min-height: 48px; padding: 0 14px; border: 1px solid var(--control); border-radius: var(--radius-control);
+    background: var(--field); color: var(--text); font: inherit; font-size: 1rem; font-weight: 400;
+}
+.sk-form .atrium-form__field textarea { padding: 12px 14px; }
+.sk-form .atrium-form__choice { font-size: 1rem; font-weight: 400; color: var(--text); }
+.sk-form .atrium-form__choice input { width: 20px; height: 20px; accent-color: var(--accent); }
+.sk-form .atrium-form__error { color: var(--error); font-weight: 600; }
+.sk-form .atrium-form__sent { color: var(--text); }
+.sk-form.atrium-form button {
+    flex: 1 1 160px; min-height: 48px; padding: 0 20px; border: 1px solid var(--brand); border-radius: var(--radius-control);
+    background: var(--brand); color: var(--on-brand); font: inherit; font-weight: 700;
+}
+.sk-form.atrium-form button:hover { text-decoration: underline; }
+.sk-form--panel { padding: 20px; border-radius: var(--radius); background: var(--surface); }
+
+/* Cards and lists. */
+.sk-price { margin: 8px 0 0; font-size: 1.0625rem; font-weight: 700; color: var(--accent); }
+ul[role="list"] { list-style: none; margin: 0; padding: 0; }
+.sk-stores { display: flex; flex-wrap: wrap; gap: 20px; }
+.sk-store { flex: 1 1 320px; display: flex; flex-direction: column; gap: 8px; padding: 28px; border-radius: var(--radius); background: var(--surface); }
+.sk-store > * { margin: 0; }
+.sk-store h3 { font-size: 1.5rem; }
+
+/* Reviews. */
+.sk-reviews { display: flex; flex-wrap: wrap; gap: 20px; }
+.sk-reviews > li { flex: 1 1 300px; display: flex; }
+.sk-review { flex: 1; margin: 0; padding: 28px; border-radius: var(--radius); background: var(--bg); color: var(--text); display: flex; flex-direction: column; gap: 16px; }
+.sk-review blockquote { margin: 0; font-size: 1.0625rem; line-height: 1.55; }
+.sk-review figcaption { font-size: .9375rem; color: var(--muted); }
+.sk-review figcaption strong { color: var(--text); }
+.sk-stars { display: flex; gap: 2px; }
+.sk-star { width: 18px; height: 18px; fill: var(--accent); }
+.sk-star--off { fill: none; stroke: var(--control); stroke-width: 1.5; }
+
+/* Questions. */
+.sk-faq__list { border-bottom: 1px solid var(--line); }
+.sk-faq__item { border-top: 1px solid var(--line); padding: 20px 0; }
+.sk-faq__item summary { cursor: pointer; min-height: 28px; font-size: 1.125rem; font-weight: 600; color: var(--text); }
+.sk-faq__answer { margin-top: 12px; line-height: 1.55; color: var(--muted); }
+.sk-faq__answer > * { margin: 0; }
+.sk-faq__answer > * + * { margin-top: .75em; }
+
+.site-footer { padding: 0; font-size: .9375rem; }
+.sk-footer { display: flex; flex-wrap: wrap; gap: 16px; padding-top: 32px; padding-bottom: 40px; }
+.sk-footer .credit { margin-left: auto; }
+
+@media (max-width: 720px) {
+    .wrap { padding: 0 20px; }
+    .sk-band { padding: 48px 0; }
+    .sk-band--tight { padding-top: 0; }
+    .sk-hero { padding-top: 32px; padding-bottom: 48px; gap: 32px; }
+    .sk-split { gap: 24px; }
+    .sk-footer .credit { margin-left: 0; }
+    .sk-head__all { margin-left: 0; }
+    .site-header .wrap { gap: 12px 20px; }
+}

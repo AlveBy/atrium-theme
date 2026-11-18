@@ -17,6 +17,8 @@ use Atrium\Admin\Support\Sites;
 use Atrium\Theme\Errors\ErrorPages;
 use Atrium\Theme\Errors\ErrorViewFinder;
 use Atrium\Theme\Http\Controllers\PageController;
+use Atrium\Theme\Skins\Skin;
+use Atrium\Theme\Skins\Skins;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Routing\Route as RoutingRoute;
 use Illuminate\Support\Facades\Event;
@@ -39,6 +41,7 @@ final class ThemeServiceProvider extends ServiceProvider
 
             return $view;
         });
+        $this->app->singleton(Skins::class);
     }
 
     public function boot(): void
@@ -46,7 +49,7 @@ final class ThemeServiceProvider extends ServiceProvider
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'atrium-theme');
         $this->loadTranslationsFrom(__DIR__.'/../lang', 'atrium-theme');
 
-        View::composer(['atrium-theme::layout', 'atrium-theme::home', 'atrium-theme::list', 'atrium-theme::page'], function (\Illuminate\View\View $view): void {
+        View::composer(['atrium-theme::layout', 'atrium-theme::home', 'atrium-theme::list', 'atrium-theme::page', 'atrium-theme::skins.*'], function (\Illuminate\View\View $view): void {
             $pages = $this->app->make(Pages::class);
             $menu = [];
 
@@ -60,6 +63,7 @@ final class ThemeServiceProvider extends ServiceProvider
                 'siteName' => $this->app->make(Sites::class)->current()->name ?: config('app.name'),
                 'homeUrl' => $pages->homeUrl(),
                 'themeStyles' => self::styles(),
+                'skin' => $this->app->make(Skins::class)->current(),
             ]);
         });
 
@@ -110,6 +114,12 @@ final class ThemeServiceProvider extends ServiceProvider
             $this->publishes([
                 __DIR__.'/../resources/views/errors' => resource_path('views/errors'),
             ], 'atrium-errors');
+
+            // The skins' fonts. atrium:install publishes the panel's
+            // assets with --force, and these with them.
+            $this->publishes([
+                Skin::fontsDirectory() => public_path(Skin::FONTS_PATH),
+            ], ['atrium-theme-assets', 'atrium-assets']);
         }
     }
 

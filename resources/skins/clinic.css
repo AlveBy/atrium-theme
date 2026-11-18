@@ -1,0 +1,131 @@
+/*
+ * This file is part of Atrium (https://github.com/AlveBy/atrium).
+ * Copyright (c) 2026 AlveBy. Licensed under the MIT License, see LICENSE.
+ */
+
+/*
+ * Skin "clinic": a medical centre. Calm blue on white, Manrope throughout.
+ * Text pairs keep at least 4.5:1, controls 3:1 (SkinsContrastTest checks
+ * every pair).
+ */
+:root {
+    color-scheme: light;
+    --bg: #f5f8fa;
+    --surface: #ffffff;
+    --text: #0b2239;
+    --muted: #4a5d70;
+    --accent: #0b6e99;
+    --control: #6b7f90;
+    --line: #dce5ec;
+    --focus: #0b6e99;
+    --brand: #0b6e99;
+    --on-brand: #ffffff;
+    --field: #f5f8fa;
+    --error: #a3271c;
+    --soft: #ddf1f7;
+    --soft-ink: #0a5878;
+    --footer: #0b2239;
+    --on-footer: #ffffff;
+}
+
+:root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0b1a2a;
+    --surface: #11263a;
+    --text: #e7f0f6;
+    --muted: #a7bacb;
+    --accent: #7cc7ea;
+    --control: #6f8aa0;
+    --line: #1f3a52;
+    --focus: #7cc7ea;
+    --brand: #7cc7ea;
+    --on-brand: #0b2239;
+    --field: #0b1a2a;
+    --error: #ffa197;
+    --soft: #123a4e;
+    --soft-ink: #9adaf2;
+    --footer: #11263a;
+    --on-footer: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --bg: #0b1a2a;
+        --surface: #11263a;
+        --text: #e7f0f6;
+        --muted: #a7bacb;
+        --accent: #7cc7ea;
+        --control: #6f8aa0;
+        --line: #1f3a52;
+        --focus: #7cc7ea;
+        --brand: #7cc7ea;
+        --on-brand: #0b2239;
+        --field: #0b1a2a;
+        --error: #ffa197;
+        --soft: #123a4e;
+        --soft-ink: #9adaf2;
+        --footer: #11263a;
+        --on-footer: #ffffff;
+    }
+}
+
+:root[data-skin="clinic"] {
+    --heading: Manrope, var(--cjk), system-ui, -apple-system, "Segoe UI", sans-serif;
+    --body: Manrope, var(--cjk), system-ui, -apple-system, "Segoe UI", sans-serif;
+    --radius: 20px;
+    --radius-control: 12px;
+}
+
+h1, h2, h3 { font-weight: 800; }
+
+.site-header { background: var(--surface); }
+.site-name { font-size: 1.375rem; font-weight: 800; }
+.sk-logo { width: 38px; height: 38px; border-radius: 12px; background: var(--brand); color: var(--on-brand); display: inline-flex; align-items: center; justify-content: center; }
+.sk-contact { display: flex; flex-direction: column; font-size: .8125rem; color: var(--muted); }
+.sk-contact .sk-phone { font-size: 1.0625rem; font-weight: 800; }
+
+.sk-hero__text { flex-basis: 520px; gap: 24px; }
+.sk-hero h1 { font-size: clamp(2.25rem, 1.4rem + 3vw, 3.375rem); line-height: 1.08; }
+.sk-form--panel { padding: 24px; background: var(--surface); border: 1px solid var(--line); }
+.sk-form .atrium-form__field { font-weight: 700; }
+.sk-form .atrium-form__field input:not([type=checkbox]):not([type=radio]), .sk-form .atrium-form__field select, .sk-form .atrium-form__field textarea { border-radius: 10px; font-weight: 500; }
+.sk-form.atrium-form button { border-radius: 10px; }
+
+.sk-services { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+.sk-service { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; padding: 28px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); }
+.sk-service > * { margin: 0; }
+.sk-service img { width: 56px; height: 56px; border-radius: 16px; }
+.sk-service h3 { font-size: 1.25rem; }
+.sk-service h3 a { color: var(--text); text-decoration: none; }
+.sk-service h3 a:hover { text-decoration: underline; }
+.sk-service__text { font-size: .9375rem; line-height: 1.5; color: var(--muted); }
+.sk-service__text > * { margin: 0; }
+.sk-service .sk-price { margin-top: auto; }
+
+.sk-band--soft .sk-head__all { color: var(--soft-ink); }
+.sk-doctors { display: flex; flex-wrap: wrap; gap: 20px; }
+.sk-doctor { flex: 1 1 280px; display: flex; align-items: center; gap: 18px; padding: 24px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); }
+.sk-doctor__photo { width: 72px; height: 72px; flex: none; border-radius: 50%; background: var(--soft); color: var(--soft-ink); display: flex; align-items: center; justify-content: center; font-size: 1.375rem; font-weight: 800; }
+.sk-doctor__text { display: flex; flex-direction: column; gap: 4px; }
+.sk-doctor__text strong { font-size: 1.125rem; }
+.sk-doctor__name { color: var(--text); text-decoration: none; }
+.sk-doctor__name:hover { text-decoration: underline; }
+.sk-doctor__text .sk-muted { font-size: .9375rem; }
+.sk-doctor__text > a { margin-top: 6px; font-size: .9375rem; font-weight: 700; }
+
+.sk-news { display: flex; flex-wrap: wrap; gap: 32px; }
+.sk-news__item { flex: 1 1 280px; display: flex; flex-direction: column; gap: 10px; padding: 24px 0; border-top: 2px solid var(--text); }
+.sk-news__item time { font-size: .875rem; color: var(--muted); }
+.sk-news__item a { font-size: 1.1875rem; font-weight: 700; line-height: 1.35; color: var(--text); text-decoration: none; }
+.sk-news__item a:hover { text-decoration: underline; }
+
+.sk-faq { padding-top: 0; }
+
+.site-footer { border-top: 0; background: var(--footer); color: var(--on-footer); }
+.site-footer :focus-visible { outline-color: var(--on-footer); }
+
+@media (max-width: 720px) {
+    .sk-contact { margin-left: 0; }
+    .sk-services { grid-template-columns: 1fr; }
+}

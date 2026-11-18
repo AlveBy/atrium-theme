@@ -1,0 +1,132 @@
+/*
+ * This file is part of Atrium (https://github.com/AlveBy/atrium).
+ * Copyright (c) 2026 AlveBy. Licensed under the MIT License, see LICENSE.
+ */
+
+/*
+ * Skin "restaurant": dark wood and saffron, opens in the dark palette.
+ * Headings in Cormorant Garamond, text in Inter. Text pairs keep at least
+ * 4.5:1, controls 3:1 (SkinsContrastTest checks every pair).
+ */
+:root {
+    color-scheme: light;
+    --bg: #faf5ec;
+    --surface: #f0e6d4;
+    --text: #1e1812;
+    --muted: #5c4e3e;
+    --accent: #74490a;
+    --control: #8c7b66;
+    --line: #ddd0ba;
+    --focus: #74490a;
+    --brand: #74490a;
+    --on-brand: #ffffff;
+    --field: #ffffff;
+    --error: #a3271c;
+}
+
+:root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #15110d;
+    --surface: #201a14;
+    --text: #f3eadb;
+    --muted: #bfaf98;
+    --accent: #e0a43a;
+    --control: #8c7b66;
+    --line: #3a3026;
+    --focus: #e0a43a;
+    --brand: #e0a43a;
+    --on-brand: #15110d;
+    --field: #201a14;
+    --error: #ffa197;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --bg: #15110d;
+        --surface: #201a14;
+        --text: #f3eadb;
+        --muted: #bfaf98;
+        --accent: #e0a43a;
+        --control: #8c7b66;
+        --line: #3a3026;
+        --focus: #e0a43a;
+        --brand: #e0a43a;
+        --on-brand: #15110d;
+        --field: #201a14;
+        --error: #ffa197;
+    }
+}
+
+:root[data-skin="restaurant"] {
+    --heading: "Cormorant Garamond", Georgia, var(--cjk), serif;
+    --body: Inter, var(--cjk), system-ui, -apple-system, "Segoe UI", sans-serif;
+    --radius: 4px;
+    --radius-control: 999px;
+}
+
+h1, h2, h3 { font-weight: 600; }
+h2 { font-size: clamp(2.5rem, 1.8rem + 2.4vw, 3.5rem); line-height: 1; }
+
+.site-header { border-bottom: 0; }
+.site-header .wrap { min-height: 84px; gap: 12px 36px; }
+.site-name { font-family: var(--heading); font-size: 2.25rem; font-weight: 700; font-style: italic; line-height: 1; }
+.menu a { font-weight: 400; font-size: .9375rem; letter-spacing: .04em; text-transform: uppercase; }
+.menu ul { gap: 4px 28px; }
+
+.sk-hero { padding-top: 48px; padding-bottom: 88px; }
+.sk-hero__text { flex-basis: 500px; gap: 26px; }
+.sk-hero h1 { font-size: clamp(3rem, 1.9rem + 4.6vw, 5.25rem); line-height: .98; letter-spacing: 0; }
+.sk-hero h1 em { color: var(--accent); }
+.sk-eyebrow { font-weight: 400; letter-spacing: .18em; text-transform: uppercase; color: var(--accent); }
+.sk-lead { line-height: 1.6; max-width: 30rem; }
+
+.sk-band--line { padding: 80px 0; }
+.sk-split__title { display: flex; flex-direction: column; gap: 20px; }
+.sk-split__title > * { margin: 0; }
+.sk-band .sk-split__title h2 { margin: 0; }
+.sk-tabs { display: flex; flex-wrap: wrap; gap: 10px; }
+.sk-tab {
+    min-height: 44px; padding: 0 20px; border-radius: 999px; border: 1px solid var(--control);
+    background: transparent; color: var(--text); font: inherit; font-size: .9375rem; font-weight: 600; cursor: pointer;
+}
+.sk-tab[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); color: var(--on-brand); }
+.sk-menu__group + .sk-menu__group { margin-top: 32px; }
+.sk-menu__group[hidden] { display: none; }
+.sk-menu__section { margin: 0 0 4px; font-size: 1.75rem; font-style: italic; }
+.sk-menu__section a { color: var(--accent); text-decoration: none; }
+.sk-menu__section a:hover { text-decoration: underline; }
+/* The tabs work with scripts only: without them every section is shown under its heading. */
+.sk-split:not([data-sk-ready]) .sk-tabs { display: none; }
+.sk-split[data-sk-ready] .sk-menu__section { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.sk-dish { display: flex; flex-direction: column; gap: 6px; padding: 20px 0; border-top: 1px solid var(--line); }
+.sk-dish__line { display: flex; align-items: baseline; gap: 12px; }
+.sk-dish__name { font-family: var(--heading); font-size: 1.625rem; font-weight: 600; line-height: 1.2; color: var(--text); text-decoration: none; }
+.sk-dish__name:hover { text-decoration: underline; }
+.sk-dish__dots { flex: 1 1 40px; border-bottom: 2px dotted var(--line); transform: translateY(-6px); }
+.sk-dish__price { font-size: 1.125rem; font-weight: 600; color: var(--accent); white-space: nowrap; }
+.sk-dish__text { font-size: .9375rem; color: var(--muted); }
+.sk-dish__text > * { margin: 0; }
+
+.sk-band--surface { padding: 96px 0; }
+.sk-quote { max-width: 960px; margin: 0 auto; text-align: center; display: flex; flex-direction: column; gap: 28px; align-items: center; }
+.sk-quote blockquote { margin: 0; font-family: var(--heading); font-size: clamp(1.75rem, 1.2rem + 2vw, 2.75rem); line-height: 1.2; font-style: italic; }
+.sk-quote figcaption { color: var(--muted); }
+
+.sk-band:not(.sk-band--line):not(.sk-band--surface) { padding: 80px 0; }
+.sk-store { gap: 10px; padding: 32px; }
+.sk-store h3 { font-size: 1.875rem; font-style: italic; color: var(--accent); }
+.sk-store p:first-of-type { font-size: 1.125rem; }
+.sk-store a { margin-top: 12px; align-self: flex-start; font-weight: 600; }
+
+#booking h2 { margin-bottom: 8px; }
+#booking .sk-muted { margin: 0 0 24px; }
+.sk-form .atrium-form__field input:not([type=checkbox]):not([type=radio]), .sk-form .atrium-form__field select, .sk-form .atrium-form__field textarea { border-radius: 10px; }
+
+.site-footer { border-top: 1px solid var(--line); color: var(--muted); }
+
+@media (max-width: 720px) {
+    .sk-band--line, .sk-band:not(.sk-band--line):not(.sk-band--surface) { padding: 56px 0; }
+    .sk-band--surface { padding: 64px 0; }
+    .sk-dish__name { font-size: 1.375rem; }
+}

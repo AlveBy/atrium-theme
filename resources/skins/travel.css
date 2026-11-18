@@ -1,0 +1,125 @@
+/*
+ * This file is part of Atrium (https://github.com/AlveBy/atrium).
+ * Copyright (c) 2026 AlveBy. Licensed under the MIT License, see LICENSE.
+ */
+
+/*
+ * Skin "travel": a travel agency. Sea green and sun yellow, headings in
+ * Unbounded, text in Manrope. Text pairs keep at least 4.5:1, controls
+ * 3:1 (SkinsContrastTest checks every pair).
+ */
+:root {
+    color-scheme: light;
+    --bg: #ffffff;
+    --surface: #e6f0ee;
+    --text: #0e2a2f;
+    --muted: #3e5559;
+    --accent: #0f5e63;
+    --control: #5c7a7d;
+    --line: #d3e2df;
+    --focus: #0f5e63;
+    --brand: #0f5e63;
+    --on-brand: #ffffff;
+    --field: #ffffff;
+    --error: #a3271c;
+    --sun: #f4b942;
+    --on-sun: #0e2a2f;
+    --band: #0e2a2f;
+    --on-band: #ffffff;
+}
+
+:root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0b1f23;
+    --surface: #12343a;
+    --text: #e6f0ee;
+    --muted: #a9c3c0;
+    --accent: #f4b942;
+    --control: #7fa3a3;
+    --line: #24474d;
+    --focus: #f4b942;
+    --brand: #f4b942;
+    --on-brand: #0e2a2f;
+    --field: #0b1f23;
+    --error: #ffa197;
+    --sun: #f4b942;
+    --on-sun: #0e2a2f;
+    --band: #12343a;
+    --on-band: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --bg: #0b1f23;
+        --surface: #12343a;
+        --text: #e6f0ee;
+        --muted: #a9c3c0;
+        --accent: #f4b942;
+        --control: #7fa3a3;
+        --line: #24474d;
+        --focus: #f4b942;
+        --brand: #f4b942;
+        --on-brand: #0e2a2f;
+        --field: #0b1f23;
+        --error: #ffa197;
+        --sun: #f4b942;
+        --on-sun: #0e2a2f;
+        --band: #12343a;
+        --on-band: #ffffff;
+    }
+}
+
+:root[data-skin="travel"] {
+    --heading: Unbounded, var(--cjk), system-ui, sans-serif;
+    --body: Manrope, var(--cjk), system-ui, -apple-system, "Segoe UI", sans-serif;
+    --radius: 20px;
+    --radius-control: 10px;
+}
+
+.site-name { font-family: var(--heading); font-size: 1.3125rem; }
+.sk-phone { font-size: 1.0625rem; }
+
+.sk-eyebrow { padding: 8px 14px; border-radius: 999px; background: var(--surface); color: var(--accent); }
+.sk-hero__art--round { border-radius: 28px; overflow: hidden; }
+.sk-hero__art--round svg { height: 460px; }
+
+.sk-tours { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+.sk-tour { display: flex; flex-direction: column; border-radius: var(--radius); overflow: hidden; background: var(--bg); border: 1px solid var(--line); }
+.sk-tour img { display: block; width: 100%; height: 200px; object-fit: cover; }
+.sk-tour__body { padding: 18px 20px 22px; display: flex; flex-direction: column; gap: 6px; }
+.sk-tour h3 { margin: 0; font-size: 1.25rem; font-weight: 600; }
+.sk-tour h3 a { color: var(--text); text-decoration: none; }
+.sk-tour h3 a:hover { text-decoration: underline; }
+.sk-tour__text { font-size: .9375rem; color: var(--muted); }
+.sk-tour__text > * { margin: 0; }
+
+.sk-features { display: flex; flex-wrap: wrap; gap: 40px; }
+.sk-feature { flex: 1 1 280px; display: flex; flex-direction: column; gap: 12px; }
+.sk-feature h3 { margin: 0; font-size: 1.1875rem; font-weight: 600; }
+.sk-feature__icon { width: 52px; height: 52px; border-radius: 14px; background: var(--sun); color: var(--on-sun); display: flex; align-items: center; justify-content: center; }
+.sk-feature__icon svg { width: 24px; height: 24px; }
+.sk-feature__text { line-height: 1.55; color: var(--muted); }
+.sk-feature__text > * { margin: 0; }
+
+.sk-band--dark { background: var(--band); color: var(--on-band); }
+.sk-band--dark :focus-visible { outline-color: var(--sun); }
+
+.sk-band--sun { background: var(--sun); color: var(--on-sun); padding: 56px 0; }
+.sk-callback { display: flex; flex-wrap: wrap; gap: 16px 32px; align-items: flex-end; }
+.sk-callback__text { flex: 2 1 360px; }
+.sk-callback__text h2 { margin: 0 0 8px; font-size: clamp(1.6rem, 1.2rem + 1.4vw, 2rem); }
+.sk-callback__text p { margin: 0; }
+.sk-callback .sk-form { flex: 3 1 480px; }
+.sk-band--sun .sk-form .atrium-form__field, .sk-band--sun .sk-form .atrium-form__choice { color: var(--on-sun); }
+.sk-band--sun .sk-form .atrium-form__field input:not([type=checkbox]):not([type=radio]) { background: #ffffff; color: #0e2a2f; border-color: #0e2a2f; }
+.sk-band--sun .sk-form.atrium-form button { background: #0e2a2f; border-color: #0e2a2f; color: #ffffff; }
+.sk-band--sun .sk-form .atrium-form__error, .sk-band--sun .sk-form .atrium-form__sent { color: var(--on-sun); }
+.sk-band--sun :focus-visible { outline-color: var(--on-sun); }
+
+.site-footer { color: var(--muted); }
+
+@media (max-width: 720px) {
+    .sk-hero__art--round svg { height: 280px; }
+    .sk-phone { margin-left: 0; }
+}

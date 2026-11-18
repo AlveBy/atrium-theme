@@ -23,6 +23,26 @@ return [
     */
     'routes' => (bool) env('ATRIUM_THEME_ROUTES', true),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Skin
+    |--------------------------------------------------------------------------
+    |
+    | A ready-made look for a kind of site: travel, restaurant, clinic or
+    | shop. Colours, fonts and a home page built from the modules (catalog,
+    | news, reviews, FAQ, forms, stores, brands, pages). Empty for the
+    | neutral theme.
+    |
+    | The fonts are files of the theme: `vendor:publish --tag=atrium-theme-assets`
+    | (atrium:install does it) puts them in public/vendor/atrium-theme.
+    |
+    */
+    'skin' => env('ATRIUM_THEME_SKIN'),
+
+    // The currency of the prices a skin shows (ISO 4217), written the way
+    // the page's language writes money: 1.234 € in German, €1,234 in English.
+    'currency' => env('ATRIUM_THEME_CURRENCY', 'EUR'),
+
     // Records per page in a list.
     'per_page' => 20,
 

@@ -1,0 +1,137 @@
+/*
+ * This file is part of Atrium (https://github.com/AlveBy/atrium).
+ * Copyright (c) 2026 AlveBy. Licensed under the MIT License, see LICENSE.
+ */
+
+/*
+ * Skin "shop": a home goods shop. Black on white with one orange, square
+ * corners; headings in Space Grotesk, text in Inter, prices and labels in
+ * JetBrains Mono. Text pairs keep at least 4.5:1, controls 3:1
+ * (SkinsContrastTest checks every pair).
+ */
+:root {
+    color-scheme: light;
+    --bg: #ffffff;
+    --surface: #f2f0eb;
+    --text: #111111;
+    --muted: #555555;
+    --accent: #111111;
+    --control: #111111;
+    --line: #e2dfd8;
+    --focus: #b33a0e;
+    --brand: #111111;
+    --on-brand: #ffffff;
+    --field: #ffffff;
+    --error: #a3271c;
+    --orange: #ff5b22;
+    --on-orange: #111111;
+    --deep: #b33a0e;
+}
+
+:root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #141312;
+    --surface: #1f1d1a;
+    --text: #f2f0eb;
+    --muted: #b5b0a6;
+    --accent: #f2f0eb;
+    --control: #f2f0eb;
+    --line: #3a3732;
+    --focus: #ff8a5b;
+    --brand: #f2f0eb;
+    --on-brand: #111111;
+    --field: #141312;
+    --error: #ffa197;
+    --orange: #ff5b22;
+    --on-orange: #111111;
+    --deep: #ff8a5b;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --bg: #141312;
+        --surface: #1f1d1a;
+        --text: #f2f0eb;
+        --muted: #b5b0a6;
+        --accent: #f2f0eb;
+        --control: #f2f0eb;
+        --line: #3a3732;
+        --focus: #ff8a5b;
+        --brand: #f2f0eb;
+        --on-brand: #111111;
+        --field: #141312;
+        --error: #ffa197;
+        --orange: #ff5b22;
+        --on-orange: #111111;
+        --deep: #ff8a5b;
+    }
+}
+
+:root[data-skin="shop"] {
+    --heading: "Space Grotesk", Inter, var(--cjk), system-ui, sans-serif;
+    --body: Inter, var(--cjk), system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, var(--cjk), monospace;
+    --radius: 0;
+    --radius-control: 0;
+}
+
+h1, h2 { font-weight: 700; }
+h2 { font-size: clamp(2rem, 1.5rem + 1.8vw, 2.5rem); }
+.sk-mono { font-family: var(--mono); font-weight: 500; font-size: .9375rem; }
+
+.sk-banner { margin: 0; padding: 10px 16px; background: var(--brand); color: var(--on-brand); font: 500 .8125rem var(--mono); text-align: center; }
+.sk-banner a { color: inherit; }
+.sk-banner :focus-visible { outline-color: var(--on-brand); outline-offset: -3px; }
+
+.site-header { border-bottom: 2px solid var(--text); }
+.site-header .wrap { min-height: 80px; gap: 12px 28px; }
+.site-name { gap: 0; font-family: var(--heading); font-size: 1.875rem; font-weight: 700; letter-spacing: .02em; }
+.sk-dot { color: var(--deep); }
+.theme-toggle { border-radius: 0; border-width: 2px; border-color: var(--control); min-height: 44px; }
+
+.sk-hero { align-items: stretch; gap: 32px; padding-top: 48px; padding-bottom: 56px; }
+.sk-hero__text { justify-content: center; gap: 24px; }
+.sk-hero h1 { font-size: clamp(2.5rem, 1.5rem + 4vw, 4.5rem); line-height: .98; letter-spacing: -0.03em; }
+.sk-eyebrow { font: 600 .875rem var(--mono); text-transform: uppercase; color: var(--deep); }
+.sk-btn { border-radius: 0; min-height: 56px; padding: 0 32px; }
+.sk-btn--ink { background: var(--brand); border-color: var(--brand); color: var(--on-brand); }
+.sk-hero__art--brand { flex-basis: 440px; background: var(--orange); display: flex; align-items: flex-end; justify-content: center; min-height: 440px; padding: 32px; }
+.sk-hero__art--brand svg { max-width: 360px; }
+
+.sk-chips { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 40px; }
+.sk-chips a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 18px; border: 2px solid var(--control); color: var(--text); font-weight: 600; text-decoration: none; }
+.sk-chips a:hover { text-decoration: underline; }
+.sk-chips .sk-chips__all { background: var(--brand); border-color: var(--brand); color: var(--on-brand); }
+
+.sk-products { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 40px 24px; }
+.sk-product { display: flex; flex-direction: column; gap: 4px; }
+.sk-product__image { position: relative; border-radius: 4px; overflow: hidden; background: var(--surface); margin-bottom: 8px; }
+.sk-product__image img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; }
+.sk-badge { position: absolute; top: 12px; left: 12px; padding: 5px 10px; background: #111111; color: #ffffff; font: 700 .75rem var(--mono); text-transform: uppercase; }
+.sk-product__brand { font-size: .8125rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.sk-product h3 { margin: 0; font-family: var(--body); font-size: 1.0625rem; font-weight: 600; }
+.sk-product h3 a { color: var(--text); text-decoration: none; }
+.sk-product h3 a:hover { text-decoration: underline; }
+.sk-product .sk-price { font: 700 1.0625rem var(--mono); color: var(--text); }
+
+.sk-brands { display: flex; flex-wrap: wrap; gap: 16px; }
+.sk-brands__item { flex: 1 1 160px; display: flex; align-items: center; justify-content: center; text-align: center; min-height: 96px; padding: 8px 12px; border: 2px solid var(--control); font-family: var(--heading); font-size: 1.5rem; font-weight: 700; }
+.sk-brands__item--1 { font-family: var(--mono); text-transform: uppercase; }
+.sk-brands__item--2 { font-family: Georgia, serif; }
+.sk-brands__item a { color: var(--text); text-decoration: none; }
+.sk-brands__item a:hover { text-decoration: underline; }
+
+.sk-store { gap: 8px; padding: 28px; background: transparent; border: 2px solid var(--control); }
+.sk-store h3 { font-size: 1.5rem; }
+.sk-store h3 a { color: var(--text); text-decoration: none; }
+.sk-store h3 a:hover { text-decoration: underline; }
+
+.site-footer { border-top: 0; background: var(--brand); color: var(--on-brand); }
+.site-footer :focus-visible { outline-color: var(--on-brand); }
+.sk-footer__brand { font-family: var(--heading); font-weight: 700; }
+
+@media (max-width: 720px) {
+    .sk-hero__art--brand { min-height: 280px; padding: 20px; }
+    .sk-products { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 16px; }
+}

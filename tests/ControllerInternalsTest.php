@@ -15,6 +15,8 @@ use Atrium\Admin\Modules\Modules;
 use Atrium\Admin\Modules\Settings;
 use Atrium\Admin\Support\ContentLanguages;
 use Atrium\Theme\Http\Controllers\PageController;
+use Atrium\Theme\Skins\HomeContent;
+use Atrium\Theme\Skins\Skins;
 use Atrium\Theme\Tests\Fixtures\Accessory;
 use Atrium\Theme\Tests\Fixtures\Crate;
 use Atrium\Theme\Tests\Fixtures\Post;
@@ -140,7 +142,7 @@ final class ControllerInternalsTest extends TestCase
         $controller = app(PageController::class);
         ProductSection::query()->create(['name' => 'Computers', 'code' => 'computers']);
 
-        $this->assertInstanceOf(View::class, $controller->home());
+        $this->assertInstanceOf(View::class, $controller->home(app(Skins::class), app(HomeContent::class)));
         $this->assertInstanceOf(View::class, $controller->index(Request::create('/catalog'), 'catalog'));
         $this->assertInstanceOf(View::class, $controller->show(Request::create('/catalog/computers'), 'catalog', 'computers'));
     }

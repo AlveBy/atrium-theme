@@ -15,6 +15,8 @@ use Atrium\Admin\Support\ContentLanguages;
 use Atrium\Admin\Support\PublicUrl;
 use Atrium\Theme\Pages;
 use Atrium\Theme\RecordView;
+use Atrium\Theme\Skins\HomeContent;
+use Atrium\Theme\Skins\Skins;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
@@ -37,8 +39,20 @@ final class PageController extends Controller
         private readonly ContentLanguages $languages,
     ) {}
 
-    public function home(): View
+    public function home(Skins $skins, HomeContent $content): View
     {
+        $switch = $this->everyLanguage(fn (string $code): string => $this->pages->homeUrl($code));
+
+        // A skin draws its home page from the modules itself.
+        if (($skin = $skins->current()) !== null) {
+            return view($skin->view('home'), [
+                'home' => $content,
+                'canonical' => $this->pages->homeUrl(),
+                'alternates' => $switch,
+                'switch' => $switch,
+            ]);
+        }
+
         $modules = [];
 
         foreach ($this->pages->prefixes() as $prefix) {
@@ -50,8 +64,6 @@ final class PageController extends Controller
                 'records' => $this->views($this->pages->visible($class)->limit((int) config('atrium-theme.home_items', 3))->get()),
             ];
         }
-
-        $switch = $this->everyLanguage(fn (string $code): string => $this->pages->homeUrl($code));
 
         return view('atrium-theme::home', [
             'modules' => $modules,

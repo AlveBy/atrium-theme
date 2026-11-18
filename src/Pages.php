@@ -11,6 +11,7 @@ namespace Atrium\Theme;
 
 use Atrium\Admin\Support\ContentLanguages;
 use Atrium\Admin\Support\PublicUrl;
+use Atrium\Theme\Skins\Skins;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Route;
@@ -123,6 +124,15 @@ final class Pages
 
     public function label(string $class): string
     {
+        // A skin names the modules for its kind of site: the catalog of a
+        // travel agency is its tours.
+        $skin = app(Skins::class)->current();
+        $prefix = PublicUrl::ruleFor($class)['prefix'] ?? null;
+
+        if ($skin !== null && $prefix !== null && $skin->hasText($key = "modules.{$prefix}")) {
+            return $skin->text($key);
+        }
+
         return method_exists($class, 'getAdminLabel')
             ? (string) $class::getAdminLabel()
             : Str::headline(Str::plural(class_basename($class)));

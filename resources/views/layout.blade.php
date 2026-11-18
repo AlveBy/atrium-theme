@@ -12,7 +12,7 @@
     $fullTitle = isset($metaTitle) && $metaTitle !== '' ? $metaTitle.$suffix : $siteName;
 @endphp
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}"@if ($skin) data-skin="{{ $skin->name }}"@if ($skin->scheme === 'dark') data-theme="dark"@endif @endif>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -40,6 +40,9 @@
     <x-atrium::hreflang :urls="$alternates ?? []" />
     <script>try{var t=localStorage.getItem('atrium-theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}</script>
     <style>{!! $themeStyles !!}</style>
+    @if ($skin)
+    <style>{!! $skin->styles() !!}</style>
+    @endif
     <x-atrium::head />
     @stack('head')
 </head>
@@ -47,9 +50,16 @@
     <x-atrium::body-start />
     <a class="skip" href="#content">{{ __('atrium-theme::theme.skip') }}</a>
 
+    @if ($skin)
+        @includeIf($skin->view('banner'))
+    @endif
     <header class="site-header">
         <div class="wrap">
+            @if ($skin)
+            <a class="site-name" href="{{ $homeUrl }}">@include($skin->view('brand'))</a>
+            @else
             <a class="site-name" href="{{ $homeUrl }}">{{ $siteName }}</a>
+            @endif
 
             @if ($menu !== [])
                 <nav class="menu" aria-label="{{ __('atrium-theme::theme.menu') }}">
@@ -63,10 +73,13 @@
 
             <x-atrium-theme::language-switcher :urls="$switch ?? []" />
             <x-atrium-theme::theme-toggle />
+            @if ($skin)
+                @includeIf($skin->view('actions'))
+            @endif
         </div>
     </header>
 
-    <main id="content" class="wrap">
+    <main id="content" class="@yield('main-class', 'wrap')">
         @if (! empty($breadcrumbs))
             <nav class="breadcrumbs" aria-label="{{ __('atrium-theme::theme.breadcrumbs') }}">
                 <ol>
@@ -82,12 +95,16 @@
     </main>
 
     <footer class="site-footer">
+        @if ($skin)
+            @include($skin->view('footer'))
+        @else
         <div class="wrap">
             <span>© {{ now()->year }} {{ $siteName }}</span>
             @if (config('atrium-theme.credit', true))
                 <a class="credit" href="https://github.com/AlveBy/atrium">{{ __('atrium-theme::theme.credit') }}</a>
             @endif
         </div>
+        @endif
     </footer>
 
     <x-atrium::body-end />
