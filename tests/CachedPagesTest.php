@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * The theme's pages of a cached module: a list costs the same queries for
- * any number of records, a warm product page almost none, and nothing is
+ * any number of records, a warm page none at all, and nothing is
  * stale after a save.
  */
 final class CachedPagesTest extends TestCase
@@ -50,7 +50,7 @@ final class CachedPagesTest extends TestCase
         $this->assertSame($few, $many);
     }
 
-    public function test_a_warm_product_page_runs_at_most_two_queries(): void
+    public function test_a_warm_product_page_runs_no_queries(): void
     {
         $this->products(1);
         $url = '/catalog/computers/laptops/product-1';
@@ -58,17 +58,17 @@ final class CachedPagesTest extends TestCase
 
         $queries = $this->queries(fn () => $this->get($url)->assertOk()->assertSee('Product 1'));
 
-        $this->assertLessThanOrEqual(2, $queries);
+        $this->assertSame(0, $queries);
     }
 
-    public function test_a_warm_list_page_runs_at_most_two_queries(): void
+    public function test_a_warm_list_page_runs_no_queries(): void
     {
         $this->products(5);
         $this->get('/catalog')->assertOk();
 
         $queries = $this->queries(fn () => $this->get('/catalog')->assertOk()->assertSee('Product 5'));
 
-        $this->assertLessThanOrEqual(2, $queries);
+        $this->assertSame(0, $queries);
     }
 
     public function test_a_save_shows_on_the_list_and_the_page_at_once(): void
