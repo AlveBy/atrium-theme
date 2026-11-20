@@ -11,8 +11,6 @@ namespace Atrium\Theme\Skins;
 
 use Atrium\Admin\Modules\Soft;
 use Atrium\Admin\Support\PublicUrl;
-use Atrium\Faq\Models\Question;
-use Atrium\Pages\PageTree;
 use Atrium\Theme\Pages;
 use Atrium\Theme\RecordView;
 use Illuminate\Database\Eloquent\Model;
@@ -48,6 +46,25 @@ final class HomeContent
     public const FORM = 'Atrium\Forms\Models\Form';
 
     /**
+     * The classes of the modules by what the home page takes from them: the
+     * models, and the two services that know more than a model does. A site
+     * or a test may name others; the modules are not required, only named.
+     */
+    public const CLASSES = [
+        'product' => self::PRODUCT,
+        'section' => self::SECTION,
+        'news' => self::NEWS,
+        'store' => self::STORE,
+        'brand' => self::BRAND,
+        'review' => self::REVIEW,
+        'question' => self::QUESTION,
+        'page' => self::PAGE,
+        'form' => self::FORM,
+        'faq' => 'Atrium\Faq\Faq',
+        'page_tree' => 'Atrium\Pages\PageTree',
+    ];
+
+    /**
      * What a page asks for more than once, read once per request.
      *
      * @var array<int,RecordView>|null
@@ -60,7 +77,10 @@ final class HomeContent
     /** @var array<string,Model|null> */
     private array $pagesByCode = [];
 
-    public function __construct(private readonly Pages $pages) {}
+    /**
+     * @param  array<string,class-string>  $classes  see CLASSES
+     */
+    public function __construct(private readonly Pages $pages, private readonly array $classes = self::CLASSES) {}
 
     /**
      * Products of the catalog, of one section when given.
@@ -69,11 +89,11 @@ final class HomeContent
      */
     public function products(int $limit, ?RecordView $section = null): array
     {
-        if (! $this->hasPages(self::PRODUCT)) {
+        if (! $this->hasPages($this->classes['product'])) {
             return [];
         }
 
-        $query = $this->pages->visible(self::PRODUCT)->limit($limit);
+        $query = $this->pages->visible($this->classes['product'])->limit($limit);
 
         if ($section !== null) {
             $query->where('section_id', $section->record->getKey());
@@ -89,11 +109,11 @@ final class HomeContent
      */
     public function sections(): array
     {
-        if (! $this->hasPages(self::SECTION)) {
+        if (! $this->hasPages($this->classes['section'])) {
             return [];
         }
 
-        return $this->sections ??= $this->views($this->pages->visible(self::SECTION)->whereNull('parent_id')->get());
+        return $this->sections ??= $this->views($this->pages->visible($this->classes['section'])->whereNull('parent_id')->get());
     }
 
     /**
@@ -120,7 +140,7 @@ final class HomeContent
      */
     public function news(int $limit): array
     {
-        return $this->hasPages(self::NEWS) ? $this->views($this->pages->visible(self::NEWS)->limit($limit)->get()) : [];
+        return $this->hasPages($this->classes['news']) ? $this->views($this->pages->visible($this->classes['news'])->limit($limit)->get()) : [];
     }
 
     /**
@@ -128,7 +148,7 @@ final class HomeContent
      */
     public function stores(): array
     {
-        return $this->stores ??= $this->hasPages(self::STORE) ? $this->views($this->pages->visible(self::STORE)->get()) : [];
+        return $this->stores ??= $this->hasPages($this->classes['store']) ? $this->views($this->pages->visible($this->classes['store'])->get()) : [];
     }
 
     /**
@@ -138,35 +158,35 @@ final class HomeContent
      */
     public function brands(): Collection
     {
-        return Soft::available(self::BRAND) ? $this->pages->visible(self::BRAND)->get() : new Collection;
+        return Soft::available($this->classes['brand']) ? $this->pages->visible($this->classes['brand'])->get() : new Collection;
     }
 
     /**
      * The newest published reviews of the site and its records.
      *
-     * @return Collection<int,\Atrium\Reviews\Models\Review>
+     * @return Collection<int,Model>
      */
     public function reviews(int $limit): Collection
     {
-        if (! Soft::available(self::REVIEW)) {
+        if (! Soft::available($this->classes['review'])) {
             return new Collection;
         }
 
-        return self::REVIEW::query()->published()->orderByDesc('posted_at')->orderByDesc('id')->limit($limit)->get();
+        return $this->classes['review']::query()->scopes(['published'])->orderByDesc('posted_at')->orderByDesc('id')->limit($limit)->get();
     }
 
     /**
      * Questions answered in the page's language.
      *
-     * @return Collection<int,Question>
+     * @return Collection<int,Model>
      */
     public function questions(int $limit): Collection
     {
-        if (! Soft::available(self::QUESTION) || ! class_exists('Atrium\Faq\Faq')) {
+        if (! Soft::available($this->classes['question']) || ! class_exists($this->classes['faq'])) {
             return new Collection;
         }
 
-        return app('Atrium\Faq\Faq')->questions()->take($limit)->values();
+        return app($this->classes['faq'])->questions()->take($limit)->values();
     }
 
     /**
@@ -174,17 +194,17 @@ final class HomeContent
      */
     public function page(string $code): ?Model
     {
-        if (! Soft::available(self::PAGE)) {
+        if (! Soft::available($this->classes['page'])) {
             return null;
         }
 
-        return $this->pagesByCode[$code] ??= self::PAGE::query()->where('code', $code)->where('active', true)->first();
+        return $this->pagesByCode[$code] ??= $this->classes['page']::query()->where('code', $code)->where('active', true)->first();
     }
 
     /**
      * The active pages right below a page, in the editors' order.
      *
-     * @return Collection<int,\Atrium\Pages\Models\Page>
+     * @return Collection<int,Model>
      */
     public function children(string $code): Collection
     {
@@ -194,12 +214,12 @@ final class HomeContent
             return new Collection;
         }
 
-        return self::PAGE::query()->where('parent_id', $page->getKey())->where('active', true)->orderBy('sort')->orderBy('id')->get();
+        return $this->classes['page']::query()->where('parent_id', $page->getKey())->where('active', true)->orderBy('sort')->orderBy('id')->get();
     }
 
     public function pageUrl(Model $page): ?string
     {
-        return $page instanceof \Atrium\Pages\Models\Page ? app(PageTree::class)->url($page) : null;
+        return $page instanceof $this->classes['page'] ? app($this->classes['page_tree'])->url($page) : null;
     }
 
     /**
@@ -207,7 +227,7 @@ final class HomeContent
      */
     public function hasForm(string $code): bool
     {
-        return Soft::available(self::FORM) && self::FORM::query()->where('code', $code)->where('active', true)->exists();
+        return Soft::available($this->classes['form']) && $this->classes['form']::query()->where('code', $code)->where('active', true)->exists();
     }
 
     /**
