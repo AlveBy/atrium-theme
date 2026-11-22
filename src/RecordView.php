@@ -295,7 +295,7 @@ final class RecordView
      * Everything else that is filled in, in the form's order. Neighbouring
      * properties are grouped into one list.
      *
-     * @return array<int,array{kind:'properties',items:array<int,array{label:string,value:string,url:?string,links:array<int,array{value:string,url:?string}>}>}|array{kind:'html',label:string,html:HtmlString}|array{kind:'images',label:string,images:array<int,string>}|array{kind:'files',label:string,files:array<int,array{name:string,url:string}>}>
+     * @return array<int,array{kind:'properties',items:array<int,array{code:string,label:string,value:string,url:?string,links:array<int,array{value:string,url:?string}>}>}|array{kind:'html',label:string,html:HtmlString}|array{kind:'images',label:string,images:array<int,string>}|array{kind:'files',label:string,files:array<int,array{name:string,url:string}>}>
      */
     public function blocks(): array
     {
@@ -329,7 +329,7 @@ final class RecordView
                     $last = array_key_last($blocks);
                 }
 
-                $blocks[$last]['items'][] = ['label' => $block['label'], 'value' => $block['value'], 'url' => $block['url'], 'links' => $block['links'] ?? []];
+                $blocks[$last]['items'][] = ['code' => $name, 'label' => $block['label'], 'value' => $block['value'], 'url' => $block['url'], 'links' => $block['links'] ?? []];
 
                 continue;
             }
@@ -600,6 +600,7 @@ final class RecordView
 
             if (isset($block['items'])) {
                 $block['items'] = array_map(static function (array $item): array {
+                    $item['code'] = $item['code'] ?? '';
                     $item['url'] = self::absolute($item['url'] ?? null);
                     $item['links'] = array_map(static fn (array $link): array => ['value' => $link['value'], 'url' => self::absolute($link['url'] ?? null)], $item['links'] ?? []);
 

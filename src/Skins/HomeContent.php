@@ -13,6 +13,7 @@ use Atrium\Admin\Modules\Soft;
 use Atrium\Admin\Support\PublicUrl;
 use Atrium\Theme\Pages;
 use Atrium\Theme\RecordView;
+use Illuminate\Database\Eloquent\Collection as ModelCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Number;
@@ -45,6 +46,8 @@ final class HomeContent
 
     public const FORM = 'Atrium\Forms\Models\Form';
 
+    public const MEMBER = 'Atrium\Team\Models\Member';
+
     /**
      * The classes of the modules by what the home page takes from them: the
      * models, and the two services that know more than a model does. A site
@@ -60,6 +63,7 @@ final class HomeContent
         'question' => self::QUESTION,
         'page' => self::PAGE,
         'form' => self::FORM,
+        'member' => self::MEMBER,
         'faq' => 'Atrium\Faq\Faq',
         'page_tree' => 'Atrium\Pages\PageTree',
     ];
@@ -117,6 +121,35 @@ final class HomeContent
     }
 
     /**
+     * A picture for a section: its own, or the first one of a product in
+     * it or in a section below it.
+     */
+    public function sectionPicture(RecordView $section): ?string
+    {
+        if (($own = $section->thumbnail()) !== null || ! $this->hasPages($this->classes['product'])) {
+            return $own;
+        }
+
+        $parents = $this->pages->visible($this->classes['section'])->pluck('parent_id', 'id')->all();
+        $ids = [$section->record->getKey()];
+
+        do {
+            $known = count($ids);
+            $ids = array_keys(array_filter($parents, static fn ($parent, $id): bool => in_array($id, $ids, true) || in_array($parent, $ids, true), ARRAY_FILTER_USE_BOTH));
+        } while (count($ids) > $known);
+
+        foreach ($this->pages->visible($this->classes['product'])->whereIn('section_id', $ids)->cursor() as $product) {
+            foreach ($this->views([$product]) as $view) {
+                if (($picture = $view->thumbnail()) !== null) {
+                    return $picture;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Each top section with its products, for a menu: sections without
      * products are left out.
      *
@@ -149,6 +182,33 @@ final class HomeContent
     public function stores(): array
     {
         return $this->stores ??= $this->hasPages($this->classes['store']) ? $this->views($this->pages->visible($this->classes['store'])->get()) : [];
+    }
+
+    /**
+     * The people of the team, in the editors' order.
+     *
+     * @return array<int,RecordView>
+     */
+    public function team(int $limit): array
+    {
+        return $this->hasPages($this->classes['member']) ? $this->views($this->pages->visible($this->classes['member'])->limit($limit)->get()) : [];
+    }
+
+    /**
+     * The records a product is shown with ("goes well with") that a
+     * visitor can open. A model without such a relation has none.
+     *
+     * @return array<int,RecordView>
+     */
+    public function related(RecordView $product, int $limit): array
+    {
+        $related = $product->record->getRelationValue('related');
+
+        if (! $related instanceof ModelCollection || $related->isEmpty()) {
+            return [];
+        }
+
+        return $this->views($this->pages->visible($product->record::class)->whereKey($related->modelKeys())->limit($limit)->get());
     }
 
     /**

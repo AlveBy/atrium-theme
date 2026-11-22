@@ -77,4 +77,23 @@ final class ModuleViewTest extends TestCase
 
         $this->assertSame($expected, (new Pages)->view($class, $page, 'default'));
     }
+
+    public function test_a_skin_draws_the_lists_and_the_records_its_own_way_unless_the_module_does(): void
+    {
+        View::addNamespace('theme-test', __DIR__.'/Fixtures/views');
+        $pages = new Pages;
+
+        config(['atrium-theme.skin' => 'atrium']);
+        $this->assertSame('atrium-theme::skins.atrium.list', $pages->view(Post::class, 'index', 'default'));
+        $this->assertSame('atrium-theme::skins.atrium.list', $pages->view(Post::class, 'section', 'default'));
+        $this->assertSame('atrium-theme::skins.atrium.page', $pages->view(Post::class, 'page', 'default'));
+        $this->assertSame('theme-test::story', $pages->view(Story::class, 'page', 'default'));
+
+        // A skin without such views, and no skin at all, leave the theme's own.
+        foreach (['travel', null] as $skin) {
+            config(['atrium-theme.skin' => $skin]);
+            $this->assertSame('default', $pages->view(Post::class, 'index', 'default'));
+            $this->assertSame('default', $pages->view(Post::class, 'page', 'default'));
+        }
+    }
 }

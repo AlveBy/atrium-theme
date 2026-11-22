@@ -250,7 +250,7 @@ final class RecordInternalsTest extends TestCase
             ],
         );
 
-        $this->assertSame([['kind' => 'properties', 'items' => [['label' => 'Shown', 'value' => 'Shown', 'url' => null, 'links' => []]]]], $blocks);
+        $this->assertSame([['kind' => 'properties', 'items' => [['code' => 'shown', 'label' => 'Shown', 'value' => 'Shown', 'url' => null, 'links' => []]]]], $blocks);
     }
 
     public function test_what_is_empty_is_not_shown_and_what_is_not_a_field_is_not_a_field(): void

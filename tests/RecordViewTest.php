@@ -139,7 +139,7 @@ final class RecordViewTest extends TestCase
         $brand = Brand::query()->create(['name' => 'Acme', 'xml_id' => 'acme']);
 
         $this->assertSame(
-            [['label' => 'Brand', 'value' => 'Acme', 'url' => null, 'links' => []]],
+            [['code' => 'brand', 'label' => 'Brand', 'value' => 'Acme', 'url' => null, 'links' => []]],
             $this->properties(['brand' => $brand->id]),
         );
     }

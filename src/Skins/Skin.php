@@ -80,6 +80,14 @@ final class Skin
     }
 
     /**
+     * Whether the skin draws a view of its own: "list", "page", …
+     */
+    public function hasView(string $name): bool
+    {
+        return view()->exists($this->view($name));
+    }
+
+    /**
      * A text of the skin in the page's language.
      *
      * @param  array<string,string|int>  $replace

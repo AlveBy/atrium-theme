@@ -24,6 +24,8 @@ final class Skins
 
     public const SHOP = 'shop';
 
+    public const ATRIUM = 'atrium';
+
     /** @var array<string,Skin>|null */
     private ?array $skins = null;
 
@@ -37,6 +39,7 @@ final class Skins
             self::RESTAURANT => new Skin(self::RESTAURANT, ['cormorant-garamond', 'inter'], 'dark'),
             self::CLINIC => new Skin(self::CLINIC, ['manrope']),
             self::SHOP => new Skin(self::SHOP, ['space-grotesk', 'inter', 'jetbrains-mono']),
+            self::ATRIUM => new Skin(self::ATRIUM, ['unbounded', 'inter']),
         ];
     }
 

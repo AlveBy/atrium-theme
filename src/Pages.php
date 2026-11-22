@@ -126,13 +126,23 @@ final class Pages
     /**
      * The view that draws a module's page: its own when the model names one
      * (`public static function themeView(string $page): ?string`, where
-     * `$page` is index, section or page), the theme's otherwise.
+     * `$page` is index, section or page), then the skin's, the theme's
+     * otherwise.
      */
     public function view(string $class, string $page, string $default): string
     {
         $view = method_exists($class, 'themeView') ? $class::themeView($page) : null;
 
-        return is_string($view) && view()->exists($view) ? $view : $default;
+        if (is_string($view) && view()->exists($view)) {
+            return $view;
+        }
+
+        // A skin may draw the theme's pages its own way: views "list" (a
+        // module's list and a section) and "page" (a record).
+        $skin = app(Skins::class)->current();
+        $own = $page === 'page' ? 'page' : 'list';
+
+        return $skin !== null && $skin->hasView($own) ? $skin->view($own) : $default;
     }
 
     public function label(string $class): string

@@ -73,6 +73,14 @@ final class SkinTest extends TestCase
         );
     }
 
+    public function test_a_skin_knows_which_views_it_draws_itself(): void
+    {
+        $this->assertTrue((new Skin('atrium', []))->hasView('page'));
+        $this->assertTrue((new Skin('atrium', []))->hasView('list'));
+        $this->assertFalse((new Skin('travel', []))->hasView('page'));
+        $this->assertFalse((new Skin('atrium', []))->hasView('nothing'));
+    }
+
     public function test_the_theme_s_own_skins_read_the_theme_s_files(): void
     {
         $skin = new Skin('travel', []);
@@ -149,6 +157,7 @@ final class SkinTest extends TestCase
             'restaurant' => [['cormorant-garamond', 'inter'], 'dark'],
             'clinic' => [['manrope'], 'light'],
             'shop' => [['space-grotesk', 'inter', 'jetbrains-mono'], 'light'],
+            'atrium' => [['unbounded', 'inter'], 'light'],
         ], $skins);
     }
 
@@ -167,13 +176,13 @@ final class SkinTest extends TestCase
         $law = new Skin('law', []);
         $skins->register($law);
 
-        $this->assertSame(['travel', 'restaurant', 'clinic', 'shop', 'law'], array_keys($skins->all()));
+        $this->assertSame(['travel', 'restaurant', 'clinic', 'shop', 'atrium', 'law'], array_keys($skins->all()));
         $this->assertSame($law, $skins->find('law'));
 
         $travel = new Skin('travel', [], 'dark');
         $skins->register($travel);
         $this->assertSame($travel, $skins->find('travel'));
-        $this->assertCount(5, $skins->all());
+        $this->assertCount(6, $skins->all());
 
         $this->assertNull($skins->find(null));
         $this->assertNull($skins->find('nope'));

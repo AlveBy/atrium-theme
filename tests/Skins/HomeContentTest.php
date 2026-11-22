@@ -50,10 +50,11 @@ final class HomeContentTest extends TestCase
     public function test_the_default_classes_are_the_modules_named_not_required(): void
     {
         $this->assertSame('Atrium\Catalog\Models\Product', HomeContent::PRODUCT);
+        $this->assertSame('Atrium\Team\Models\Member', HomeContent::MEMBER);
         $this->assertSame('Atrium\Pages\PageTree', HomeContent::CLASSES['page_tree']);
         $this->assertSame('Atrium\Faq\Faq', HomeContent::CLASSES['faq']);
         $this->assertSame(
-            ['product', 'section', 'news', 'store', 'brand', 'review', 'question', 'page', 'form', 'faq', 'page_tree'],
+            ['product', 'section', 'news', 'store', 'brand', 'review', 'question', 'page', 'form', 'member', 'faq', 'page_tree'],
             array_keys(HomeContent::CLASSES),
         );
         $this->assertSame(HomeContent::CLASSES, (new \ReflectionProperty(HomeContent::class, 'classes'))->getValue(app(HomeContent::class)));
@@ -64,6 +65,7 @@ final class HomeContentTest extends TestCase
         $this->assertSame([], $none->sections());
         $this->assertSame([], $none->news(3));
         $this->assertSame([], $none->stores());
+        $this->assertSame([], $none->team(3));
         $this->assertCount(0, $none->brands());
         $this->assertCount(0, $none->reviews(3));
         $this->assertCount(0, $none->questions(3));
@@ -126,6 +128,29 @@ final class HomeContentTest extends TestCase
         $this->assertSame([], $this->home(['section' => self::MISSING])->sections());
     }
 
+    public function test_a_section_takes_its_picture_from_its_own_or_from_a_product_below_it(): void
+    {
+        $top = $this->section('Decor', 'decor');
+        $middle = $this->section('Vases', 'vases', $top);
+        $deep = $this->section('Glass', 'glass', $middle);
+        $other = $this->section('Lighting', 'lighting');
+        $hidden = $this->section('Hidden', 'hidden', $top, active: false);
+        $this->product('Bare', 'bare', 5, section: $deep);
+        $this->product('Vase', 'vase', 10, section: $deep)->update(['preview_picture' => '/vase.jpg']);
+        $this->product('Lamp', 'lamp', 20, section: $other);
+        $this->product('Ghost', 'ghost', 30, section: $hidden)->update(['preview_picture' => '/ghost.jpg']);
+
+        $home = $this->home();
+
+        $this->assertSame($this->root().'/vase.jpg', $home->sectionPicture($this->viewOf($top)));
+        $this->assertSame($this->root().'/vase.jpg', $home->sectionPicture($this->viewOf($deep)));
+        $this->assertNull($home->sectionPicture($this->viewOf($other)));
+
+        $top->update(['preview_picture' => '/decor.jpg']);
+        $this->assertSame($this->root().'/decor.jpg', $home->sectionPicture($this->viewOf($top->refresh())));
+        $this->assertNull($this->home(['product' => self::MISSING])->sectionPicture($this->viewOf($other)));
+    }
+
     public function test_the_menu_has_every_section_with_products(): void
     {
         $decor = $this->section('Decor', 'decor');
@@ -183,6 +208,36 @@ final class HomeContentTest extends TestCase
         $this->assertSame(['Alpha', 'Beta'], $this->names($this->home()->news(2)));
         $this->assertSame(['Alpha', 'Beta', 'Gamma'], $this->names($this->home()->news(9)));
         $this->assertSame([], $this->home(['news' => self::MISSING])->news(2));
+    }
+
+    public function test_the_team_is_the_visible_people_in_order_up_to_the_limit(): void
+    {
+        $this->outlet('Second', [], 20);
+        $this->outlet('First', [], 10);
+        $this->outlet('Hidden', [], 5, active: false);
+        $this->outlet('Third', [], 30);
+
+        $this->assertSame(['First', 'Second'], $this->names($this->home()->team(2)));
+        $this->assertSame(['First', 'Second', 'Third'], $this->names($this->home()->team(9)));
+        $this->assertSame([], $this->home(['member' => self::MISSING])->team(2));
+    }
+
+    public function test_the_related_records_are_the_ones_a_visitor_can_open(): void
+    {
+        $main = $this->product('Main', 'main', 10);
+        $shown = $this->product('Shown', 'shown', 20);
+        $hidden = $this->product('Hidden', 'hidden', 30, active: false);
+        $second = $this->product('Second', 'second', 40);
+        $main->related()->attach([$second->id, $hidden->id, $shown->id]);
+        $home = $this->home();
+
+        $this->assertSame(['Shown', 'Second'], $this->names($home->related($this->viewOf($main), 5)));
+        $this->assertSame(['Shown'], $this->names($home->related($this->viewOf($main), 1)));
+        // Nothing linked, or nothing that can be opened, and a model without the relation.
+        $this->assertSame([], $home->related($this->viewOf($shown), 5));
+        $this->assertSame([], $home->related($this->viewOf($this->outlet('Store', [])), 5));
+        $main->related()->sync([$hidden->id]);
+        $this->assertSame([], $home->related($this->viewOf($main->refresh()), 5));
     }
 
     public function test_stores_are_the_visible_ones_in_order(): void
@@ -449,6 +504,7 @@ final class HomeContentTest extends TestCase
             'question' => Question::class,
             'page' => Page::class,
             'form' => Form::class,
+            'member' => Outlet::class,
             'faq' => Faq::class,
             'page_tree' => PageTree::class,
             ...$classes,

@@ -88,11 +88,11 @@ final class RecordViewFromCardTest extends TestCase
             'body' => '<p>Body</p>',
             'blocks' => [
                 ['kind' => 'properties', 'items' => [
-                    ['label' => 'Article', 'value' => 'A-1', 'url' => null, 'links' => []],
-                    ['label' => 'Price', 'value' => $price, 'url' => null, 'links' => []],
-                    ['label' => 'Color', 'value' => 'Silver', 'url' => null, 'links' => []],
-                    ['label' => 'Brand', 'value' => 'Northwind', 'url' => null, 'links' => []],
-                    ['label' => 'Related', 'value' => 'Mouse', 'url' => null, 'links' => [['value' => 'Mouse', 'url' => '/catalog/laptops/mouse']]],
+                    ['code' => 'article', 'label' => 'Article', 'value' => 'A-1', 'url' => null, 'links' => []],
+                    ['code' => 'price', 'label' => 'Price', 'value' => $price, 'url' => null, 'links' => []],
+                    ['code' => 'color', 'label' => 'Color', 'value' => 'Silver', 'url' => null, 'links' => []],
+                    ['code' => 'brand', 'label' => 'Brand', 'value' => 'Northwind', 'url' => null, 'links' => []],
+                    ['code' => 'related', 'label' => 'Related', 'value' => 'Mouse', 'url' => null, 'links' => [['value' => 'Mouse', 'url' => '/catalog/laptops/mouse']]],
                 ]],
                 ['kind' => 'html', 'label' => 'Specifications', 'html' => '<p>Specs</p>'],
                 ['kind' => 'images', 'label' => 'Photos', 'images' => ['/upload/a.jpg', '/storage/products/b.jpg', 'https://cdn.example.com/c.jpg']],
@@ -235,7 +235,7 @@ final class RecordViewFromCardTest extends TestCase
             ['kind' => 'properties', 'items' => [
                 ['label' => 'Related', 'value' => 'Mouse', 'url' => null, 'links' => [['value' => 'Mouse', 'url' => '/catalog/mouse'], ['value' => 'Cat', 'url' => null]]],
                 ['label' => 'Brand', 'value' => 'Northwind', 'url' => '/brands/northwind'],
-                ['label' => 'Color', 'value' => 'Silver'],
+                ['code' => 'color', 'label' => 'Color', 'value' => 'Silver'],
             ]],
             ['kind' => 'html', 'label' => 'Specifications', 'html' => '<p>Specs</p>'],
             ['kind' => 'images', 'label' => 'Photos', 'images' => ['/upload/a.jpg', 'https://cdn.example.com/c.jpg']],
@@ -246,9 +246,9 @@ final class RecordViewFromCardTest extends TestCase
 
         $this->assertEquals([
             ['kind' => 'properties', 'items' => [
-                ['label' => 'Related', 'value' => 'Mouse', 'url' => null, 'links' => [['value' => 'Mouse', 'url' => $this->root().'/catalog/mouse'], ['value' => 'Cat', 'url' => null]]],
-                ['label' => 'Brand', 'value' => 'Northwind', 'url' => $this->root().'/brands/northwind', 'links' => []],
-                ['label' => 'Color', 'value' => 'Silver', 'url' => null, 'links' => []],
+                ['code' => '', 'label' => 'Related', 'value' => 'Mouse', 'url' => null, 'links' => [['value' => 'Mouse', 'url' => $this->root().'/catalog/mouse'], ['value' => 'Cat', 'url' => null]]],
+                ['code' => '', 'label' => 'Brand', 'value' => 'Northwind', 'url' => $this->root().'/brands/northwind', 'links' => []],
+                ['code' => 'color', 'label' => 'Color', 'value' => 'Silver', 'url' => null, 'links' => []],
             ]],
             ['kind' => 'html', 'label' => 'Specifications', 'html' => new HtmlString('<p>Specs</p>')],
             ['kind' => 'images', 'label' => 'Photos', 'images' => [$this->root().'/upload/a.jpg', 'https://cdn.example.com/c.jpg']],

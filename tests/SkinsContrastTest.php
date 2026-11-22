@@ -32,6 +32,7 @@ final class SkinsContrastTest extends BaseTestCase
         'restaurant' => [['on-brand', 'brand'], ['text', 'field']],
         'clinic' => [['on-brand', 'brand'], ['soft-ink', 'soft'], ['text', 'soft'], ['on-footer', 'footer'], ['text', 'field']],
         'shop' => [['on-brand', 'brand'], ['deep', 'bg'], ['muted', 'bg'], ['text', 'field']],
+        'atrium' => [['on-brand', 'brand'], ['on-amber', 'amber'], ['on-ink', 'ink'], ['on-ink-muted', 'ink'], ['text', 'soft'], ['muted', 'soft'], ['accent', 'soft'], ['text', 'field'], ['text', 'tint-1'], ['text', 'tint-2'], ['text', 'tint-3']],
     ];
 
     /** Focus rings and outlines on the skin's own bands, 3:1. */
@@ -40,6 +41,7 @@ final class SkinsContrastTest extends BaseTestCase
         'restaurant' => [],
         'clinic' => [['on-footer', 'footer'], ['control', 'soft']],
         'shop' => [['on-brand', 'brand']],
+        'atrium' => [['control', 'soft'], ['focus', 'soft'], ['amber', 'ink']],
     ];
 
     /**

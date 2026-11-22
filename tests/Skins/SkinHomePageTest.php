@@ -27,7 +27,7 @@ final class SkinHomePageTest extends TestCase
      */
     public static function skins(): array
     {
-        return ['travel' => ['travel'], 'restaurant' => ['restaurant'], 'clinic' => ['clinic'], 'shop' => ['shop']];
+        return ['travel' => ['travel'], 'restaurant' => ['restaurant'], 'clinic' => ['clinic'], 'shop' => ['shop'], 'atrium' => ['atrium']];
     }
 
     #[DataProvider('skins')]

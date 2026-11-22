@@ -26,6 +26,7 @@ return new class extends Migration
             $table->boolean('active')->default(true);
             $table->integer('sort')->default(500);
             $table->text('description')->nullable();
+            $table->string('preview_picture')->nullable();
             $table->timestamps();
         });
 

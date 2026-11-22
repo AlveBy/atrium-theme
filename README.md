@@ -45,7 +45,7 @@ Each module is a menu item, labelled with its admin label.
 
 ## Skins
 
-Four skins, each with its palette, its fonts and a home page built from the installed modules: a travel agency, a restaurant, a medical centre and a home goods shop.
+Five skins, each with its palette, its fonts and a home page built from the installed modules: a travel agency, a restaurant, a medical centre, a home goods shop and `atrium`, the public demo's own, which draws the catalog, product, news and store pages too.
 
 | `travel` | `restaurant` |
 |---|---|
@@ -78,7 +78,7 @@ Other settings (`php artisan vendor:publish --tag=atrium-theme-config`):
 | `routes` | `true` | register the pages |
 | `per_page` | `20` | records per page in a list |
 | `home_items` | `3` | records of each module on the home page |
-| `skin` | `null` | `travel`, `restaurant`, `clinic` or `shop` (`ATRIUM_THEME_SKIN`) |
+| `skin` | `null` | `travel`, `restaurant`, `clinic`, `shop` or `atrium` (`ATRIUM_THEME_SKIN`) |
 | `currency` | `EUR` | the ISO 4217 code of the skins' prices (`ATRIUM_THEME_CURRENCY`) |
 | `record_views` | `[]` | views drawn under every record page with `$record` and `$page`; module packages such as `alveby/atrium-reviews` add theirs |
 | `credit` | `true` | a small "Made with Atrium" link in the footer (`ATRIUM_THEME_CREDIT=false` hides it) |
