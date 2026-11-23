@@ -156,9 +156,16 @@ final class Pages
             return $skin->text($key);
         }
 
-        return method_exists($class, 'getAdminLabel')
-            ? (string) $class::getAdminLabel()
-            : Str::headline(Str::plural(class_basename($class)));
+        // A module may give visitors a name other than the admin's: the
+        // admin keeps "FAQ sections" apart from "FAQ questions", a visitor
+        // reads "FAQ".
+        foreach (['getPublicLabel', 'getAdminLabel'] as $method) {
+            if (method_exists($class, $method)) {
+                return (string) $class::$method();
+            }
+        }
+
+        return Str::headline(Str::plural(class_basename($class)));
     }
 
     /**

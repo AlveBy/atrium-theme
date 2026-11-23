@@ -14,6 +14,7 @@ use Atrium\Admin\Support\ContentLanguages;
 use Atrium\Admin\Support\PublicUrl;
 use Atrium\Theme\Pages;
 use Atrium\Theme\Tests\Fixtures\Brand;
+use Atrium\Theme\Tests\Fixtures\Edition;
 use Atrium\Theme\Tests\Fixtures\Numbered;
 use Atrium\Theme\Tests\Fixtures\Post;
 use Atrium\Theme\Tests\Fixtures\Product;
@@ -72,6 +73,13 @@ final class PagesInternalsTest extends TestCase
         $this->assertSame('Brands', $this->pages->label(Brand::class));
         $this->assertSame('Std Classes', $this->pages->label(stdClass::class));
         $this->assertSame('7', $this->pages->label(Numbered::class));
+    }
+
+    public function test_a_module_may_name_itself_to_visitors_other_than_to_the_admin(): void
+    {
+        $this->assertSame('Edition sections', Edition::getAdminLabel());
+        $this->assertSame('Editions', $this->pages->label(Edition::class));
+        $this->assertSame('Posts', $this->pages->label(Post::class), 'the rest keep the admin label');
     }
 
     private function language(): void
