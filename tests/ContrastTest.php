@@ -18,7 +18,7 @@ use PHPUnit\Framework\TestCase as BaseTestCase;
  */
 final class ContrastTest extends BaseTestCase
 {
-    private const TEXT = ['text', 'muted', 'accent'];
+    private const TEXT = ['text', 'muted', 'accent', 'error'];
 
     private const CONTROLS = ['control', 'focus'];
 
@@ -36,7 +36,7 @@ final class ContrastTest extends BaseTestCase
     public function test_text_and_controls_are_readable(string $palette): void
     {
         $colours = self::palette($palette);
-        $this->assertCount(8, $colours, 'every colour of the palette is read');
+        $this->assertCount(9, $colours, 'every colour of the palette is read');
 
         foreach (self::BACKGROUNDS as $background) {
             foreach (self::TEXT as $text) {

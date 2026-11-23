@@ -20,6 +20,7 @@
     --control: #6b7280;
     --line: #e2e5ea;
     --focus: #1d4ed8;
+    --error: #b91c1c;
 }
 
 :root[data-theme="dark"] {
@@ -32,6 +33,7 @@
     --control: #858d99;
     --line: #2c3038;
     --focus: #8db4ff;
+    --error: #ffa197;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -45,6 +47,7 @@
         --control: #858d99;
         --line: #2c3038;
         --focus: #8db4ff;
+        --error: #ffa197;
     }
 }
 
