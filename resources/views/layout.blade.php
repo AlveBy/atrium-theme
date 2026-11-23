@@ -6,6 +6,10 @@
     The page frame of the theme. Publish the views (vendor:publish
     --tag=atrium-theme-views) to change it; colours are custom properties
     in the stylesheet below, override them in a stylesheet of your own.
+
+    @atriumSlot('…') marks the places modules add to with Hook::slot()
+    (docs/modules.md, "Slots in the site's templates"): keep them when you
+    change the frame, or a module's output has nowhere to go.
 --}}
 @php
     $suffix = (string) config('atrium.seo.title_suffix', '');
@@ -48,6 +52,7 @@
 </head>
 <body>
     <x-atrium::body-start />
+    @atriumSlot('body.start')
     <a class="skip" href="#content">{{ __('atrium-theme::theme.skip') }}</a>
 
     @if ($skin)
@@ -55,6 +60,7 @@
     @endif
     <header class="site-header">
         <div class="wrap">
+            @atriumSlot('header.start')
             @if ($skin)
             <a class="site-name" href="{{ $homeUrl }}">@include($skin->view('brand'))</a>
             @else
@@ -72,6 +78,7 @@
             @if ($skin)
                 @includeIf($skin->view('actions'))
             @endif
+            @atriumSlot('header.end')
         </div>
     </header>
 
@@ -87,10 +94,13 @@
             </nav>
         @endif
 
+        @atriumSlot('content.before')
         @yield('content')
+        @atriumSlot('content.after')
     </main>
 
     <footer class="site-footer">
+        @atriumSlot('footer.start')
         @if ($skin)
             @include($skin->view('footer'))
         @else
@@ -104,8 +114,10 @@
             @endif
         </div>
         @endif
+        @atriumSlot('footer.end')
     </footer>
 
     <x-atrium::body-end />
+    @atriumSlot('body.end')
 </body>
 </html>
