@@ -23,7 +23,7 @@
         @endif
 
         @if ($body = $page->body())
-            <div class="content">{!! $body !!}</div>
+            <div class="content">@embeds($body)</div>
         @endif
 
         @foreach ($page->blocks() as $block)

@@ -20,7 +20,7 @@
     </div>
     <div class="at-store-page__more">
         @if ($text)
-            <div class="at-prose">{!! $text !!}</div>
+            <div class="at-prose">@embeds($text)</div>
         @endif
         @include('atrium-theme::skins.atrium.blocks', ['blocks' => $blocks])
     </div>

@@ -11,7 +11,7 @@
             @foreach ($questions as $question)
                 <details class="sk-faq__item">
                     <summary>{{ $question->translated('question') }}</summary>
-                    <div class="sk-faq__answer">{!! $question->translated('answer') !!}</div>
+                    <div class="sk-faq__answer">@embeds($question->translated('answer'))</div>
                 </details>
             @endforeach
         </div>

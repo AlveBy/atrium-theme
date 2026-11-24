@@ -37,7 +37,7 @@
     </div>
 
     @if ($text)
-        <div class="at-section-text">{!! $text !!}</div>
+        <div class="at-section-text">@embeds($text)</div>
     @endif
 
     @if ($sections !== [])

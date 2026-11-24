@@ -25,7 +25,7 @@
             <p class="sk-eyebrow">{{ $skin->text('eyebrow') }}</p>
             <h1 id="sk-hero-title">{{ $hero?->name ?: $siteName }}</h1>
             @if ($hero && filled($hero->content))
-                <div class="sk-lead">{!! $hero->content !!}</div>
+                <div class="sk-lead">@embeds($hero->content)</div>
             @endif
             @if ($home->hasForm('tour-request'))
                 @include('atrium-theme::skins.partials.form', ['code' => 'tour-request', 'class' => 'sk-form--panel'])
@@ -47,7 +47,7 @@
                             <div class="sk-tour__body">
                                 <h3><a href="{{ $tour->url() }}">{{ $tour->title() }}</a></h3>
                                 @if ($teaser = $tour->teaser())
-                                    <div class="sk-tour__text">{!! $teaser !!}</div>
+                                    <div class="sk-tour__text">@embeds($teaser)</div>
                                 @endif
                                 @if ($price = $home->price($tour, $skin))
                                     <p class="sk-price">{{ $price }}</p>
@@ -69,7 +69,7 @@
                         <li class="sk-feature">
                             <span class="sk-feature__icon">@include('atrium-theme::skins.travel.icon', ['index' => $loop->index])</span>
                             <h3>{{ $feature->name }}</h3>
-                            <div class="sk-feature__text">{!! $feature->content !!}</div>
+                            <div class="sk-feature__text">@embeds($feature->content)</div>
                         </li>
                     @endforeach
                 </ul>

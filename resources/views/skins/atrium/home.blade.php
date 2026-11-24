@@ -37,7 +37,7 @@
             <h1 id="at-hero-title">{{ $hero?->name ?: $skin->text('hero_title') }}</h1>
             <div class="at-hero__lead">
                 @if ($hero && filled($hero->content))
-                    {!! $hero->content !!}
+                    @embeds($hero->content)
                 @else
                     <p>{{ $skin->text('hero_text') }}</p>
                 @endif
@@ -149,7 +149,7 @@
                                     @endif
                                     <h3><a class="at-link" href="{{ $item->url() }}">{{ $item->title() }}</a></h3>
                                     @if ($teaser = $item->teaser())
-                                        <div class="at-teaser">{!! $teaser !!}</div>
+                                        <div class="at-teaser">@embeds($teaser)</div>
                                     @endif
                                 </div>
                             </li>

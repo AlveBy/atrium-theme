@@ -20,7 +20,7 @@
     @case('html')
         <section>
             <h2>{{ $block['label'] }}</h2>
-            <div class="content">{!! $block['html'] !!}</div>
+            <div class="content">@embeds($block['html'])</div>
         </section>
         @break
 

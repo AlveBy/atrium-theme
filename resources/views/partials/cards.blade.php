@@ -16,7 +16,7 @@
                 @endif
                 <{{ $heading }}><a href="{{ $url }}">{{ $record->title() }}</a></{{ $heading }}>
                 @if ($teaser = $record->teaser())
-                    <div class="card-text">{!! $teaser !!}</div>
+                    <div class="card-text">@embeds($teaser)</div>
                 @endif
             </div>
         </li>

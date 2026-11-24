@@ -60,7 +60,7 @@
         </div>
         <h1>{{ $page->title() }}</h1>
         @if ($lead)
-            <div class="at-buy__lead">{!! $lead !!}</div>
+            <div class="at-buy__lead">@embeds($lead)</div>
         @endif
 
         <div class="at-buy__panel">
@@ -112,7 +112,7 @@
     @if ($text)
         <section>
             <h2>{{ $skin->text('description') }}</h2>
-            <div class="at-prose">{!! $text !!}</div>
+            <div class="at-prose">@embeds($text)</div>
         </section>
     @endif
     @include('atrium-theme::skins.atrium.blocks', ['blocks' => $rest])

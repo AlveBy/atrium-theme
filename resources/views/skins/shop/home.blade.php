@@ -25,7 +25,7 @@
             <p class="sk-eyebrow">{{ $skin->text('eyebrow') }}</p>
             <h1 id="sk-hero-title">{{ $hero?->name ?: $siteName }}</h1>
             @if ($hero && filled($hero->content))
-                <div class="sk-lead">{!! $hero->content !!}</div>
+                <div class="sk-lead">@embeds($hero->content)</div>
             @endif
             @if ($catalog)
                 <a class="sk-btn sk-btn--ink" href="{{ $catalog }}">{{ $skin->text('catalog_button') }}</a>

@@ -13,7 +13,7 @@
     <h1>{{ $title }}</h1>
 
     @if ($text)
-        <div class="content">{!! $text !!}</div>
+        <div class="content">@embeds($text)</div>
     @endif
 
     @if ($sections !== [])

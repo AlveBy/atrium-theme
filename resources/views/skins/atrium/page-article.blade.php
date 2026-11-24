@@ -16,7 +16,7 @@
     @endif
     <h1>{{ $page->title() }}</h1>
     @if ($text)
-        <div class="at-prose">{!! $text !!}</div>
+        <div class="at-prose">@embeds($text)</div>
     @endif
     @include('atrium-theme::skins.atrium.blocks', ['blocks' => $page->blocks()])
 </article>

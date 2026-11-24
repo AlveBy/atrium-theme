@@ -25,7 +25,7 @@
         <div class="sk-hero__text">
             <h1 id="sk-hero-title">{{ $hero?->name ?: $siteName }}</h1>
             @if ($hero && filled($hero->content))
-                <div class="sk-lead">{!! $hero->content !!}</div>
+                <div class="sk-lead">@embeds($hero->content)</div>
             @endif
             @if ($home->hasForm('appointment'))
                 <div id="appointment">
@@ -48,7 +48,7 @@
                             @endif
                             <h3><a href="{{ $service->url() }}">{{ $service->title() }}</a></h3>
                             @if ($teaser = $service->teaser())
-                                <div class="sk-service__text">{!! $teaser !!}</div>
+                                <div class="sk-service__text">@embeds($teaser)</div>
                             @endif
                             @if ($price = $home->price($service, $skin))
                                 <p class="sk-price">{{ $price }}</p>

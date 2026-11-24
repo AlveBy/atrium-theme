@@ -28,7 +28,7 @@
             <p class="sk-eyebrow">{{ $skin->text('eyebrow') }}</p>
             <h1 id="sk-hero-title">{{ implode(' ', $words) }}@if ($last) <em>{{ $last }}</em>@endif</h1>
             @if ($hero && filled($hero->content))
-                <div class="sk-lead">{!! $hero->content !!}</div>
+                <div class="sk-lead">@embeds($hero->content)</div>
             @endif
             <div class="sk-actions">
                 @if ($menuUrl = $home->indexUrl($home::PRODUCT))
@@ -71,7 +71,7 @@
                                             @endif
                                         </div>
                                         @if ($teaser = $dish->teaser())
-                                            <div class="sk-dish__text">{!! $teaser !!}</div>
+                                            <div class="sk-dish__text">@embeds($teaser)</div>
                                         @endif
                                     </li>
                                 @endforeach

@@ -23,7 +23,7 @@
     @endif
     <h3><a href="{{ $product->url() }}">{{ $product->title() }}</a></h3>
     @if ($teaser = $product->teaser())
-        <div class="at-product__teaser">{!! $teaser !!}</div>
+        <div class="at-product__teaser">@embeds($teaser)</div>
     @endif
     <div class="at-product__foot">
         @if ($price)

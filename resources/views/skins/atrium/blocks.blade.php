@@ -24,7 +24,7 @@
         @case('html')
             <section>
                 <h2>{{ $block['label'] }}</h2>
-                <div class="at-prose">{!! $block['html'] !!}</div>
+                <div class="at-prose">@embeds($block['html'])</div>
             </section>
             @break
 
