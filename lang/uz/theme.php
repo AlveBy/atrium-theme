@@ -21,4 +21,5 @@ return [
     'empty' => 'Hozircha bu yerda hech narsa yo‘q.',
     'all' => 'Hammasini ko‘rsatish',
     'credit' => 'Atrium asosida yaratilgan',
+    'template_full_width' => 'To‘liq kenglik',
 ];

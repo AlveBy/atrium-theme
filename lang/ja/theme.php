@@ -21,4 +21,5 @@ return [
     'empty' => 'まだ何もありません。',
     'all' => 'すべて表示',
     'credit' => 'Atrium で作成',
+    'template_full_width' => '全幅',
 ];

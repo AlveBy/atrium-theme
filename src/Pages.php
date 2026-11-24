@@ -15,6 +15,7 @@ use Atrium\Admin\Contracts\Cacheable;
 use Atrium\Admin\Fields\BelongsToField;
 use Atrium\Admin\Support\ContentLanguages;
 use Atrium\Admin\Support\PublicUrl;
+use Atrium\Admin\Templates\Templates;
 use Atrium\Theme\Skins\Skins;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -143,6 +144,15 @@ final class Pages
         $own = $page === 'page' ? 'page' : 'list';
 
         return $skin !== null && $skin->hasView($own) ? $skin->view($own) : $default;
+    }
+
+    /**
+     * The view that draws a record: the template its editor picked, or
+     * $default, the view of view() when it has none or the file is gone.
+     */
+    public function template(Model $record, string $default): string
+    {
+        return app(Templates::class)->viewOf($record, $default);
     }
 
     public function label(string $class): string

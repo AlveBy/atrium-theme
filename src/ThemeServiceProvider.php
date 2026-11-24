@@ -16,6 +16,7 @@ use Atrium\Admin\Support\PublicUrl;
 use Atrium\Admin\Support\RecordUrls;
 use Atrium\Admin\Support\Sitemap;
 use Atrium\Admin\Support\Sites;
+use Atrium\Admin\Templates\Templates;
 use Atrium\Theme\Errors\ErrorPages;
 use Atrium\Theme\Errors\ErrorViewFinder;
 use Atrium\Theme\Http\Controllers\PageController;
@@ -78,6 +79,16 @@ final class ThemeServiceProvider extends ServiceProvider
             if ($pages->themed()) {
                 $view->with($pages->prepare());
             }
+        });
+
+        // The templates an editor picks for a record: the theme's own, and
+        // the current skin's before them.
+        $this->callAfterResolving(Templates::class, function (Templates $templates): void {
+            $templates->roots(function (): array {
+                $skin = $this->app->make(Skins::class)->current();
+
+                return [...($skin === null ? [] : ["{$skin->views}::skins.{$skin->name}."]), 'atrium-theme::'];
+            });
         });
 
         // After every provider and the app's own routes: a route the app

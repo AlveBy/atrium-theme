@@ -21,4 +21,5 @@ return [
     'empty' => 'Na razie nic tu nie ma.',
     'all' => 'Pokaż wszystko',
     'credit' => 'Zbudowane na Atrium',
+    'template_full_width' => 'Pełna szerokość',
 ];

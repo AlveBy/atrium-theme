@@ -134,6 +134,9 @@ mark { background: var(--surface); color: var(--text); font-weight: 700; border-
 :root[data-theme="dark"] .theme-toggle .when-light { display: none; }
 
 main.wrap { padding-top: 2rem; padding-bottom: 3rem; }
+/* The "Full width" template: the page runs from edge to edge. */
+main.wrap-full { padding: 2rem 1.25rem 3rem; }
+main.wrap-full .content { max-width: none; }
 
 .breadcrumbs { font-size: .9rem; color: var(--muted); margin-bottom: 1rem; }
 .breadcrumbs li + li::before { content: "/"; margin-right: 1rem; color: var(--muted); }

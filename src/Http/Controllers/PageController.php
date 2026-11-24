@@ -126,7 +126,10 @@ final class PageController extends Controller
             return $this->section($request, $prefix, $record, $view, $url, $breadcrumbs, $urls, $switch);
         }
 
-        return view($this->pages->view($record::class, 'page', 'atrium-theme::page'), [
+        $default = $this->pages->view($record::class, 'page', 'atrium-theme::page');
+
+        return view($this->pages->template($record, $default), [
+            'defaultView' => $default,
             'page' => $view,
             'canonical' => $url,
             'breadcrumbs' => $breadcrumbs,
@@ -157,7 +160,10 @@ final class PageController extends Controller
             }
         }
 
-        return view($this->pages->view($section::class, 'section', 'atrium-theme::list'), [
+        $default = $this->pages->view($section::class, 'section', 'atrium-theme::list');
+
+        return view($this->pages->template($section, $default), [
+            'defaultView' => $default,
             'title' => $view->title(),
             'page' => $view,
             'text' => $view->body(),

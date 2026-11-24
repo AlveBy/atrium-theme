@@ -21,4 +21,5 @@ return [
     'empty' => 'Burada henüz bir şey yok.',
     'all' => 'Tümünü göster',
     'credit' => 'Atrium ile yapıldı',
+    'template_full_width' => 'Tam genişlik',
 ];
