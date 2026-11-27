@@ -1,0 +1,8 @@
+/*
+ * This file is part of Atrium (https://github.com/AlveBy/atrium).
+ * Copyright (c) 2026 AlveBy. Licensed under the MIT License, see LICENSE.
+ */
+
+.b-picture { margin: 0; }
+.b-picture img { display: block; width: 100%; border-radius: .4rem; }
+.b-picture figcaption { margin-top: .4rem; color: var(--muted); font-size: .9rem; }

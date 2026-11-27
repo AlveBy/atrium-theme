@@ -1,0 +1,8 @@
+/*
+ * This file is part of Atrium (https://github.com/AlveBy/atrium).
+ * Copyright (c) 2026 AlveBy. Licensed under the MIT License, see LICENSE.
+ */
+
+.b-map { margin: 0; }
+.b-map-frame { display: block; width: 100%; aspect-ratio: 2 / 1; min-height: 16rem; border: 0; border-radius: .4rem; }
+.b-map figcaption { display: flex; flex-wrap: wrap; gap: .25rem 1rem; margin-top: .4rem; color: var(--muted); font-size: .9rem; }

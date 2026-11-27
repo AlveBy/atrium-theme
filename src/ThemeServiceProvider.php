@@ -9,14 +9,21 @@ declare(strict_types=1);
 
 namespace Atrium\Theme;
 
+use Atrium\Admin\Builder\BlockTypes;
 use Atrium\Admin\Cache\RecordCache;
 use Atrium\Admin\Contracts\Sitemapable;
+use Atrium\Admin\Hooks\Hooks;
 use Atrium\Admin\Support\ContentLanguages;
 use Atrium\Admin\Support\PublicUrl;
 use Atrium\Admin\Support\RecordUrls;
 use Atrium\Admin\Support\Sitemap;
 use Atrium\Admin\Support\Sites;
 use Atrium\Admin\Templates\Templates;
+use Atrium\Theme\Builder\Blocks\ButtonBlock;
+use Atrium\Theme\Builder\Blocks\GalleryBlock;
+use Atrium\Theme\Builder\Blocks\MapBlock;
+use Atrium\Theme\Builder\Blocks\PictureBlock;
+use Atrium\Theme\Builder\Blocks\TextBlock;
 use Atrium\Theme\Errors\ErrorPages;
 use Atrium\Theme\Errors\ErrorViewFinder;
 use Atrium\Theme\Http\Controllers\PageController;
@@ -52,6 +59,11 @@ final class ThemeServiceProvider extends ServiceProvider
     {
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'atrium-theme');
         $this->loadTranslationsFrom(__DIR__.'/../lang', 'atrium-theme');
+
+        // The block types of the site builder that need no other module.
+        foreach ([10 => ['text', TextBlock::class], 20 => ['picture', PictureBlock::class], 30 => ['gallery', GalleryBlock::class], 40 => ['button', ButtonBlock::class], 50 => ['map', MapBlock::class]] as $priority => [$key, $class]) {
+            $this->app->make(Hooks::class)->register(BlockTypes::REGISTRY, $key, new $class, $priority);
+        }
 
         View::composer(['atrium-theme::layout', 'atrium-theme::home', 'atrium-theme::list', 'atrium-theme::page', 'atrium-theme::skins.*'], function (\Illuminate\View\View $view): void {
             $pages = $this->app->make(Pages::class);

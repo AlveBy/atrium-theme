@@ -1,0 +1,32 @@
+/*
+ * This file is part of Atrium (https://github.com/AlveBy/atrium).
+ * Copyright (c) 2026 AlveBy. Licensed under the MIT License, see LICENSE.
+ */
+
+/* A page made of blocks: sections, each a grid of twelve columns. */
+.content:has(> .atrium-layout) { max-width: none; }
+.b-section { padding: 1.5rem 0; }
+.b-inner { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 1.5rem; max-width: 72rem; margin: 0 auto; }
+.b-width-narrow .b-inner { max-width: 46rem; }
+.b-width-full .b-inner { max-width: none; }
+.b-tone-tinted { background: var(--surface); padding-inline: 1.25rem; border-radius: .6rem; }
+.main-builder .b-section { padding-inline: 1.25rem; }
+.main-builder .b-tone-tinted { border-radius: 0; }
+.b-column { min-width: 0; }
+.b-column > * + * { margin-top: 1.25rem; }
+.b-block .content { max-width: none; }
+.b-block .content > :first-child { margin-top: 0; }
+.b-block .content > :last-child { margin-bottom: 0; }
+.b-span-1 { grid-column: span 1; }
+.b-span-2 { grid-column: span 2; }
+.b-span-3 { grid-column: span 3; }
+.b-span-4 { grid-column: span 4; }
+.b-span-5 { grid-column: span 5; }
+.b-span-6 { grid-column: span 6; }
+.b-span-7 { grid-column: span 7; }
+.b-span-8 { grid-column: span 8; }
+.b-span-9 { grid-column: span 9; }
+.b-span-10 { grid-column: span 10; }
+.b-span-11 { grid-column: span 11; }
+.b-span-12 { grid-column: span 12; }
+@media (max-width: 40rem) { .b-column { grid-column: 1 / -1; } }

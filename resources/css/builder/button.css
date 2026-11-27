@@ -1,0 +1,11 @@
+/*
+ * This file is part of Atrium (https://github.com/AlveBy/atrium).
+ * Copyright (c) 2026 AlveBy. Licensed under the MIT License, see LICENSE.
+ */
+
+/* Filled or outlined: the two looks differ in shape, not only in colour. */
+.b-button { margin: 0; }
+.b-button-link { display: inline-block; padding: .65rem 1.4rem; border: 2px solid var(--accent); border-radius: .4rem; font-weight: 600; text-decoration: none; }
+.b-button-link:hover { text-decoration: underline; text-decoration-thickness: 2px; }
+.b-button-primary { background: var(--accent); color: var(--bg); }
+.b-button-secondary { background: transparent; color: var(--accent); }
